@@ -825,38 +825,38 @@ remove_list="${other_list}${privapp_list}${reqd_list}${obsolete_list}${oldscript
 
 # _____________________________________________________________________________________________________________________
 #                                             Installer Error Messages
-arch_compat_msg="INSTALLATION FAILURE: This Open GApps package cannot be installed on this\ndevice's architecture. Please download the correct version for your device.\n"
-camera_sys_msg="WARNING: Google Camera has/will not be installed as requested. Google Camera\ncan only be installed during a Clean Install or as an update to an existing\nGApps Installation.\n"
-camera_compat_msg="WARNING: Google Camera has/will not be installed as requested. Google Camera\nis NOT compatible with your device if installed on the system partition. Try\ninstalling from the Play Store instead.\n"
-cmcompatibility_msg="WARNING: PackageInstallerGoogle is not installed. Cyanogenmod is NOT\ncompatible with some Google Applications and Open GApps\n will skip their installation.\n"
-dialergoogle_msg="WARNING: Google Dialer has/will not be installed as requested. Dialer Framework\nmust be added to the GApps installation if you want to install the\nGoogle Dialer.\n"
-googlenow_msg="WARNING: Google Now Launcher has/will not be installed as requested. Google Search\nmust be added to the GApps installation if you want to install the\nGoogle Now Launcher.\n"
-messenger_msg="WARNING: Google Messages has/will not be installed as requested. Carrier Services\nmust be added to the GApps installation on Android 6.0+ if you want to install\nGoogle Messages.\n"
-pixellauncher_msg="WARNING: Pixel Launcher has/will not be installed as requested. Wallpapers and\nGoogle Search must be added to the GApps installation if you want to install\nthe Pixel Launcher.\n"
-projectfi_msg="WARNING: Project Fi has/will not be installed as requested. GCS must be\nadded to the GApps installation if you want to install the Project Fi app.\n"
-nobuildprop="INSTALLATION FAILURE: The installed ROM has no build.prop or equivalent\n"
-nokeyboard_msg="NOTE: The Stock/AOSP keyboard was NOT removed as requested to ensure your device\nwas not accidentally left with no keyboard installed. If this was intentional,\nyou can add 'Override' to your gapps-config to override this protection.\n"
-nolauncher_msg="NOTE: The Stock/AOSP Launcher was NOT removed as requested to ensure your device\nwas not accidentally left with no Launcher. If this was your intention, you can\nadd 'Override' to your gapps-config to override this protection.\n"
-nomms_msg="NOTE: The Stock/AOSP MMS app was NOT removed as requested to ensure your device\nwas not accidentally left with no way to receive text messages. If this WAS\nintentional, add 'Override' to your gapps-config to override this protection.\n"
-nowebview_msg="NOTE: The Stock/AOSP WebView was NOT removed as requested to ensure your device\nwas not accidentally left with no WebViewProvider installed. If this was intentional,\nyou can add 'Override' to your gapps-config to override this protection.\n"
-non_open_gapps_msg="INSTALLATION FAILURE: Open GApps can only be installed on top of an existing\nOpen GApps installation. Since you are currently using another GApps package, you\nwill need to wipe (format) your system partition before installing Open GApps.\n"
-fornexus_open_gapps_msg="NOTE: The installer detected that you already have Stock ROM GApps installed.\nThe installer will now continue, but please be aware that there could be problems.\n"
-recovery_compression_msg="INSTALLATION FAILURE: Your ROM uses transparent compression, but your recovery\ndoes not support this feature, resulting in corrupt files.\nPlease update your recovery before flashing ANY package to prevent corruption.\n"
-rom_android_version_msg="INSTALLATION FAILURE: This GApps package can only be installed on a $req_android_version.x ROM.\n"
-simulation_msg="TEST INSTALL: This was only a simulated install. NO CHANGES WERE MADE TO YOUR\nDEVICE. To complete the installation remove 'Test' from your gapps-config.\n"
-stubwebview_msg="NOTE: Stub WebView was installed instead of Google WebView because your device\nhas already Chrome installed as WebViewProvider. If you still want Google WebView,\nyou can add 'Override' to your gapps-config to override this redundancy protection.\n"
-system_space_msg="INSTALLATION FAILURE: Your device does not have sufficient space available in\nthe system partition to install this GApps package as currently configured.\nYou will need to switch to a smaller GApps package or use gapps-config to\nreduce the installed size.\n"
-user_multiplefound_msg="NOTE: All User Application Removals included in gapps-config were unable to be\nprocessed as requested because multiple versions of the app were found on your\ndevice. See the log portion below for the name(s) of the application(s).\n"
-user_notfound_msg="NOTE: All User Application Removals included in gapps-config were unable to be\nremoved as requested because the files were not found on your device. See the\nlog portion below for the name(s) of the application(s).\n"
-vrservice_compat_msg="WARNING: Google VR Services has/will not be installed as requested.\nGoogle VR Services is NOT compatible with your device.\n"
-del_conflict_msg="!!! WARNING !!! - Duplicate files were found between your ROM and this GApps\npackage. This is likely due to your ROM's dev including Google proprietary\nfiles in the ROM. The duplicate files are shown in the log portion below.\n"
+arch_compat_msg="INSTALLATION FAILURE: This Open GApps package cannot be installed on this\\ndevice's architecture. Please download the correct version for your device.\\n"
+camera_sys_msg="WARNING: Google Camera has/will not be installed as requested. Google Camera\\ncan only be installed during a Clean Install or as an update to an existing\\nGApps Installation.\\n"
+camera_compat_msg="WARNING: Google Camera has/will not be installed as requested. Google Camera\\nis NOT compatible with your device if installed on the system partition. Try\\ninstalling from the Play Store instead.\\n"
+cmcompatibility_msg="WARNING: PackageInstallerGoogle is not installed. Cyanogenmod is NOT\\ncompatible with some Google Applications and Open GApps\\n will skip their installation.\\n"
+dialergoogle_msg="WARNING: Google Dialer has/will not be installed as requested. Dialer Framework\\nmust be added to the GApps installation if you want to install the\\nGoogle Dialer.\\n"
+googlenow_msg="WARNING: Google Now Launcher has/will not be installed as requested. Google Search\\nmust be added to the GApps installation if you want to install the\\nGoogle Now Launcher.\\n"
+messenger_msg="WARNING: Google Messages has/will not be installed as requested. Carrier Services\\nmust be added to the GApps installation on Android 6.0+ if you want to install\\nGoogle Messages.\\n"
+pixellauncher_msg="WARNING: Pixel Launcher has/will not be installed as requested. Wallpapers and\\nGoogle Search must be added to the GApps installation if you want to install\\nthe Pixel Launcher.\\n"
+projectfi_msg="WARNING: Project Fi has/will not be installed as requested. GCS must be\\nadded to the GApps installation if you want to install the Project Fi app.\\n"
+nobuildprop="INSTALLATION FAILURE: The installed ROM has no build.prop or equivalent\\n"
+nokeyboard_msg="NOTE: The Stock/AOSP keyboard was NOT removed as requested to ensure your device\\nwas not accidentally left with no keyboard installed. If this was intentional,\\nyou can add 'Override' to your gapps-config to override this protection.\\n"
+nolauncher_msg="NOTE: The Stock/AOSP Launcher was NOT removed as requested to ensure your device\\nwas not accidentally left with no Launcher. If this was your intention, you can\\nadd 'Override' to your gapps-config to override this protection.\\n"
+nomms_msg="NOTE: The Stock/AOSP MMS app was NOT removed as requested to ensure your device\\nwas not accidentally left with no way to receive text messages. If this WAS\\nintentional, add 'Override' to your gapps-config to override this protection.\\n"
+nowebview_msg="NOTE: The Stock/AOSP WebView was NOT removed as requested to ensure your device\\nwas not accidentally left with no WebViewProvider installed. If this was intentional,\\nyou can add 'Override' to your gapps-config to override this protection.\\n"
+non_open_gapps_msg="INSTALLATION FAILURE: Open GApps can only be installed on top of an existing\\nOpen GApps installation. Since you are currently using another GApps package, you\\nwill need to wipe (format) your system partition before installing Open GApps.\\n"
+fornexus_open_gapps_msg="NOTE: The installer detected that you already have Stock ROM GApps installed.\\nThe installer will now continue, but please be aware that there could be problems.\\n"
+recovery_compression_msg="INSTALLATION FAILURE: Your ROM uses transparent compression, but your recovery\\ndoes not support this feature, resulting in corrupt files.\\nPlease update your recovery before flashing ANY package to prevent corruption.\\n"
+rom_android_version_msg="INSTALLATION FAILURE: This GApps package can only be installed on a $req_android_version.x ROM.\\n"
+simulation_msg="TEST INSTALL: This was only a simulated install. NO CHANGES WERE MADE TO YOUR\\nDEVICE. To complete the installation remove 'Test' from your gapps-config.\\n"
+stubwebview_msg="NOTE: Stub WebView was installed instead of Google WebView because your device\\nhas already Chrome installed as WebViewProvider. If you still want Google WebView,\\nyou can add 'Override' to your gapps-config to override this redundancy protection.\\n"
+system_space_msg="INSTALLATION FAILURE: Your device does not have sufficient space available in\\nthe system partition to install this GApps package as currently configured.\\nYou will need to switch to a smaller GApps package or use gapps-config to\\nreduce the installed size.\\n"
+user_multiplefound_msg="NOTE: All User Application Removals included in gapps-config were unable to be\\nprocessed as requested because multiple versions of the app were found on your\\ndevice. See the log portion below for the name(s) of the application(s).\\n"
+user_notfound_msg="NOTE: All User Application Removals included in gapps-config were unable to be\\nremoved as requested because the files were not found on your device. See the\\nlog portion below for the name(s) of the application(s).\\n"
+vrservice_compat_msg="WARNING: Google VR Services has/will not be installed as requested.\\nGoogle VR Services is NOT compatible with your device.\\n"
+del_conflict_msg="!!! WARNING !!! - Duplicate files were found between your ROM and this GApps\\npackage. This is likely due to your ROM's dev including Google proprietary\\nfiles in the ROM. The duplicate files are shown in the log portion below.\\n"
 
-nogooglecontacts_removal_msg="NOTE: The Stock/AOSP Contacts is not available on your\nROM (anymore), the Google equivalent will not be removed."
-nogoogledialer_removal_msg="NOTE: The Stock/AOSP Dialer is not available on your\nROM (anymore), the Google equivalent will not be removed."
-nogooglekeyboard_removal_msg="NOTE: The Stock/AOSP Keyboard is not available on your\nROM (anymore), the Google equivalent will not be removed."
-nogooglepackageinstaller_removal_msg="NOTE: The Stock/AOSP Package Installer is not\navailable on your ROM (anymore), the Google equivalent will not be removed."
-nogoogletag_removal_msg="NOTE: The Stock/AOSP NFC Tag is not available on your\nROM (anymore), the Google equivalent will not be removed."
-nogooglewebview_removal_msg="NOTE: The Stock/AOSP WebView is not available on your\nROM (anymore), not all Google WebViewProviders will be removed."
+nogooglecontacts_removal_msg="NOTE: The Stock/AOSP Contacts is not available on your\\nROM (anymore), the Google equivalent will not be removed."
+nogoogledialer_removal_msg="NOTE: The Stock/AOSP Dialer is not available on your\\nROM (anymore), the Google equivalent will not be removed."
+nogooglekeyboard_removal_msg="NOTE: The Stock/AOSP Keyboard is not available on your\\nROM (anymore), the Google equivalent will not be removed."
+nogooglepackageinstaller_removal_msg="NOTE: The Stock/AOSP Package Installer is not\\navailable on your ROM (anymore), the Google equivalent will not be removed."
+nogoogletag_removal_msg="NOTE: The Stock/AOSP NFC Tag is not available on your\\nROM (anymore), the Google equivalent will not be removed."
+nogooglewebview_removal_msg="NOTE: The Stock/AOSP WebView is not available on your\\nROM (anymore), not all Google WebViewProviders will be removed."
 
 # _____________________________________________________________________________________________________________________
 #                                                  Pre-define Helper Functions
@@ -1087,7 +1087,7 @@ rec_tmp_log=$TMP/recovery.log
 user_remove_notfound_log=$TMP/user_remove_notfound.log
 user_remove_multiplefound_log=$TMP/user_remove_multiplefound.log
 
-log_close="# End Open GApps Install Log\n"
+log_close="# End Open GApps Install Log\\n"
 
 reclaimed_gapps_space_kb=0
 reclaimed_removal_space_kb=0
@@ -1334,15 +1334,15 @@ install_extracted() {
 }
 
 log() {
-  printf "%31s | %s\n" "$1" "$2" >> $g_log
+  printf "%31s | %s\\n" "$1" "$2" >> $g_log
 }
 
 log_add() {
-  printf "%7s | %26s | + %7d | %7d\n" "$1" "$2" "$3" "$4">> $calc_log
+  printf "%7s | %26s | + %7d | %7d\\n" "$1" "$2" "$3" "$4">> $calc_log
 }
 
 log_sub() {
-  printf "%7s | %26s | - %7d | %7d\n" "$1" "$2" "$3" "$4">> $calc_log
+  printf "%7s | %26s | - %7d | %7d\\n" "$1" "$2" "$3" "$4">> $calc_log
 }
 
 obsolete_gapps_list() {
@@ -1370,7 +1370,7 @@ odexapk() {
       dex="install -d \"$apkdir/oat/$req_android_arch\" && $dex --instruction-set=\"$req_android_arch\" --oat-file=\"$apkdir/oat/$req_android_arch/$apkname.odex\""
       eval "$dex"
       # Add the dex2oat command to addon.d for re-running during a restore
-      sed -i "\:# Re-pre-ODEX APKs (from GApps Installer):a \    $dex" $bkup_tail
+      sed -i "\\:# Re-pre-ODEX APKs (from GApps Installer):a \\    $dex" $bkup_tail
     fi
   fi
 }
@@ -1393,7 +1393,7 @@ quit() {
     echo "# Begin User App Removals NOT Found (from gapps-config)" >> $g_log
     cat $user_remove_notfound_log >> $g_log
     rm -f $user_remove_notfound_log
-    echo -e "# End User App Removals NOT Found (from gapps-config)\n" >> $g_log
+    echo -e "# End User App Removals NOT Found (from gapps-config)\\n" >> $g_log
   fi
   # Add User App Removals MultipleFound Log if it exists
   if [ -r $user_remove_multiplefound_log ]; then
@@ -1401,7 +1401,7 @@ quit() {
     echo "# Begin User App Removals MULTIPLE Found (from gapps-config)" >> $g_log
     cat $user_remove_multiplefound_log >> $g_log
     rm -f $user_remove_multiplefound_log
-    echo -e "# End User App Removals MULTIPLE Found (from gapps-config)\n" >> $g_log
+    echo -e "# End User App Removals MULTIPLE Found (from gapps-config)\\n" >> $g_log
   fi
 
   # Add Duplicate Files Log if it exists
@@ -1410,7 +1410,7 @@ quit() {
     echo "# Begin GApps <> ROM Duplicate File List" >> $g_log
     cat $conflicts_log >> $g_log
     rm -f $conflicts_log
-    echo -e "# End GApps <> ROM Duplicate File List\n" >> $g_log
+    echo -e "# End GApps <> ROM Duplicate File List\\n" >> $g_log
   fi
 
   # Add Installation Calculations to the log if they were performed
@@ -1418,7 +1418,7 @@ quit() {
     echo "# Begin GApps Size Calculations" >> $g_log
     cat $calc_log >> $g_log
     rm -f $calc_log
-    echo -e "\n# End GApps Size Calculations" >> $g_log
+    echo -e "\\n# End GApps Size Calculations" >> $g_log
   fi
 
   # Add list of Raw User Application Removals back to end of processed gapps-config for display in gapps log
@@ -1430,13 +1430,13 @@ quit() {
 
   set_progress 0.96
   # Add gapps-config information to the log
-  echo -e "\n# Begin User's gapps-config" >> $g_log
+  echo -e "\\n# Begin User's gapps-config" >> $g_log
   if [ "$g_conf" ]; then
     cat "$g_conf" >> $g_log
   else
     echo -n "   *** NOT USED ***" >> $g_log
   fi
-  echo -e "\n# End User's gapps-config" >> $g_log
+  echo -e "\\n# End User's gapps-config" >> $g_log
 
   # Copy logs to proper folder (Same as gapps-config or same as Zip)
   ui_print "- Copying Log to $log_folder"
@@ -1708,7 +1708,7 @@ done
 
 # Determine Recovery Type and Version
 for rec_log in $rec_tmp_log $rec_cache_log; do
-  recovery=$(grep -m 2 -E " Recovery v|Starting TWRP|Welcome to|PhilZ|Starting recovery \(" $rec_log)
+  recovery=$(grep -m 2 -E " Recovery v|Starting TWRP|Welcome to|PhilZ|Starting recovery \\(" $rec_log)
   case "$recovery" in
     *Welcome*)  recovery="$(grep -m 1 "Welcome to" $rec_log | awk '{ print substr($0, index($0,$3)) }')$(grep -m 1 "^ext.version" $rec_log | cut -d\" -f2)"; break;;
     *Recovery*) recovery=$(grep -m 1 "Recovery v" $rec_log); recovery=${recovery/Recovery v/Recovery }; break;;
@@ -1815,7 +1815,7 @@ fi
 
 # Remove any files from gapps-remove.txt that should not be processed for automatic removal
 for bypass_file in $removal_bypass_list; do
-  sed -i "\:${bypass_file}:d" $gapps_removal_list
+  sed -i "\\:${bypass_file}:d" $gapps_removal_list
 done
 
 # Is this a 'Clean' or 'Dirty' install
@@ -1948,7 +1948,7 @@ for pkg in $pkg_names; do
   all_gapps_list=${all_gapps_list}${addto} # Look for method to combine this with line above
   if ( grep -qiE "^${pkg}gapps\$" "$g_conf" ); then # user has selected a 'preset' install
     gapps_type=$pkg
-    sed -i "/ro.addon.open_type/c\ro.addon.open_type=$pkg" "$TMP/g.prop" # modify g.prop to new package type
+    sed -i "/ro.addon.open_type/c\\ro.addon.open_type=$pkg" "$TMP/g.prop" # modify g.prop to new package type
     break
   fi
 done
@@ -1990,7 +1990,7 @@ fi
 set_progress 0.03
 if [ "$g_conf" ]; then
   for default_name in $default_stock_remove_list; do
-    if ( grep -qiE "^\+$default_name\$" "$g_conf" ); then
+    if ( grep -qiE "^\\+$default_name\$" "$g_conf" ); then
       eval "remove_${default_name}=false[gapps-config]"
     elif [ "$gapps_type" = "super" ] || [ "$gapps_type" = "stock" ] || [ "$gapps_type" = "aroma" ]; then
       aosp_remove_list="$aosp_remove_list$default_name$newline"
@@ -2254,8 +2254,8 @@ for f in $contactsstock_list; do
 done
 if [ "$ignoregooglecontacts" = "true" ]; then
   if ( ! contains "$gapps_list" "contactsgoogle" ) && ( ! grep -qiE '^override$' "$g_conf" ); then
-    sed -i "\:/system/priv-app/GoogleContacts:d" $gapps_removal_list
-    sed -i "\:/system/product/priv-app/GoogleContacts:d" $gapps_removal_list
+    sed -i "\\:/system/priv-app/GoogleContacts:d" $gapps_removal_list
+    sed -i "\\:/system/product/priv-app/GoogleContacts:d" $gapps_removal_list
     ignoregooglecontacts="true[NoRemove]"
     install_note="${install_note}nogooglecontacts_removal_msg$newline" # make note that Google Contacts will not be removed
   else
@@ -2272,8 +2272,8 @@ for f in $dialerstock_list; do
 done
 if [ "$ignoregoogledialer" = "true" ]; then
   if ( ! contains "$gapps_list" "dialergoogle" ) && ( ! grep -qiE '^override$' "$g_conf" ); then
-    sed -i "\:/system/priv-app/GoogleDialer:d" $gapps_removal_list
-    sed -i "\:/system/product/priv-app/GoogleDialer:d" $gapps_removal_list
+    sed -i "\\:/system/priv-app/GoogleDialer:d" $gapps_removal_list
+    sed -i "\\:/system/product/priv-app/GoogleDialer:d" $gapps_removal_list
     ignoregoogledialer="true[NoRemove]"
     install_note="${install_note}nogoogledialer_removal_msg$newline" # make note that Google Dialer will not be removed
   else
@@ -2307,8 +2307,8 @@ for f in $packageinstallerstock_list; do
 done
 if [ "$ignoregooglepackageinstaller" = "true" ]; then
   if ( ! contains "$gapps_list" "packageinstallergoogle" ) && ( ! grep -qiE '^override$' "$g_conf" ); then
-    sed -i "\:/system/priv-app/GooglePackageInstaller:d" $gapps_removal_list
-    sed -i "\:/system/product/priv-app/GooglePackageInstaller:d" $gapps_removal_list
+    sed -i "\\:/system/priv-app/GooglePackageInstaller:d" $gapps_removal_list
+    sed -i "\\:/system/product/priv-app/GooglePackageInstaller:d" $gapps_removal_list
     ignoregooglepackageinstaller="true[NoRemove]"
     install_note="${install_note}nogooglepackageinstaller_removal_msg$newline" # make note that Google Package Installer will not be removed
   else
@@ -2325,8 +2325,8 @@ for f in $tagstock_list; do
 done
 if [ "$ignoregoogletag" = "true" ]; then
   if ( ! contains "$gapps_list" "taggoogle" ) && ( ! grep -qiE '^override$' "$g_conf" ); then
-    sed -i "\:/system/priv-app/TagGoogle:d" $gapps_removal_list
-    sed -i "\:/system/product/priv-app/TagGoogle:d" $gapps_removal_list
+    sed -i "\\:/system/priv-app/TagGoogle:d" $gapps_removal_list
+    sed -i "\\:/system/product/priv-app/TagGoogle:d" $gapps_removal_list
     ignoregoogletag="true[NoRemove]"
     install_note="${install_note}nogoogletag_removal_msg$newline" # make note that Google Tag will not be removed
   else
@@ -2463,11 +2463,11 @@ reclaimed_removal_space_kb=$(du -ck $(obsolete_gapps_list) | tail -n 1 | awk '{ 
 # Add information to calc.log that will later be added to open_gapps.log to assist user with app removals
 post_install_size_kb=$((free_system_size_kb + reclaimed_gapps_space_kb)) # Add opening calculations
 echo ------------------------------------------------------------------ > $calc_log
-printf "%7s | %26s |   %7s | %7s\n" "TYPE " "DESCRIPTION       " "SIZE" "  TOTAL" >> $calc_log
-printf "%7s | %26s |   %7d | %7d\n" "" "Current Free Space" "$free_system_size_kb" "$free_system_size_kb" >> $calc_log
-printf "%7s | %26s | + %7d | %7d\n" "Remove" "Existing GApps" "$reclaimed_gapps_space_kb" $post_install_size_kb >> $calc_log
+printf "%7s | %26s |   %7s | %7s\\n" "TYPE " "DESCRIPTION       " "SIZE" "  TOTAL" >> $calc_log
+printf "%7s | %26s |   %7d | %7d\\n" "" "Current Free Space" "$free_system_size_kb" "$free_system_size_kb" >> $calc_log
+printf "%7s | %26s | + %7d | %7d\\n" "Remove" "Existing GApps" "$reclaimed_gapps_space_kb" $post_install_size_kb >> $calc_log
 post_install_size_kb=$((post_install_size_kb + reclaimed_removal_space_kb)) # Add reclaimed_removal_space_kb
-printf "%7s | %26s | + %7d | %7d\n" "Remove" "Obsolete Files" "$reclaimed_removal_space_kb" $post_install_size_kb >> $calc_log
+printf "%7s | %26s | + %7d | %7d\\n" "Remove" "Obsolete Files" "$reclaimed_removal_space_kb" $post_install_size_kb >> $calc_log
 
 # Perform calculations of AOSP/ROM files that will be deleted
 set_progress 0.07
@@ -2528,11 +2528,11 @@ log_sub "" "Buffer Space" "$buffer_size_kb" $post_install_size_kb
 echo ------------------------------------------------------------------ >> $calc_log
 
 if [ "$post_install_size_kb" -ge 0 ]; then
-  printf "%47s | %7d\n" "  Post Install Free Space" $post_install_size_kb >> $calc_log
+  printf "%47s | %7d\\n" "  Post Install Free Space" $post_install_size_kb >> $calc_log
   log "Post Install Free Space (KB)" "$post_install_size_kb   << See Calculations Below"
 else
   additional_size_kb=$((post_install_size_kb * -1))
-  printf "%47s | %7d\n" "Additional Space Required" $additional_size_kb >> $calc_log
+  printf "%47s | %7d\\n" "Additional Space Required" $additional_size_kb >> $calc_log
   log "Additional Space Required (KB)" "$additional_size_kb   << See Calculations Below"
 fi
 
@@ -2583,18 +2583,18 @@ for aosp_name in $aosp_remove_list; do
   list_name=$(echo "${list_name}" | sort -r) # reverse sort list for more readable output
   for file_name in $list_name; do
     rm -rf "/system/$file_name" "/system/product/$file_name"
-    sed -i "\:# Remove Stock/AOSP apps (from GApps Installer):a \    rm -rf \$SYS/$file_name" $bkup_tail
+    sed -i "\\:# Remove Stock/AOSP apps (from GApps Installer):a \\    rm -rf \$SYS/$file_name" $bkup_tail
   done
 done
 
 # Add saved addon.d User App Removals to make them persistent through repeat dirty GApps installs though the app may have already been removed
-user_remove_folder_list=$(echo -e "${user_remove_folder_list}\n${addond_remove_folder_list}" | sort -u | sed '/^$/d')  # remove duplicates and empty lines
+user_remove_folder_list=$(echo -e "${user_remove_folder_list}\\n${addond_remove_folder_list}" | sort -u | sed '/^$/d')  # remove duplicates and empty lines
 
 # Perform User App Removals and add Removals to addon.d script
 user_remove_folder_list=$(echo "${user_remove_folder_list}" | sort -r) # reverse sort list for more readable output
 for user_app in $user_remove_folder_list; do
   rm -rf "$user_app"
-  sed -i "\:# Remove 'user requested' apps (from gapps-config):a \    rm -rf $user_app" $bkup_tail
+  sed -i "\\:# Remove 'user requested' apps (from gapps-config):a \\    rm -rf $user_app" $bkup_tail
 done
 
 # Remove any empty folders we may have created during the removal process
@@ -2653,14 +2653,14 @@ ui_print " "
 
 # Use Gms (Google Play services) for feedback/bug reporting (instead of org.cyanogenmod.bugreport or others)
 sed -i "s/ro.error.receiver.system.apps=.*/ro.error.receiver.system.apps=com.google.android.gms/g" /system/build.prop
-sed -i "\:# Apply build.prop changes (from GApps Installer):a \    sed -i \"s/ro.error.receiver.system.apps=.*/ro.error.receiver.system.apps=com.google.android.gms/g\" \$SYS/build.prop" $bkup_tail
+sed -i "\\:# Apply build.prop changes (from GApps Installer):a \\    sed -i \"s/ro.error.receiver.system.apps=.*/ro.error.receiver.system.apps=com.google.android.gms/g\" \$SYS/build.prop" $bkup_tail
 
 # Enable Google Assistant
 if ( grep -qiE '^googleassistant$' "$g_conf" ); then  #TODO this is not enabled by default atm; because Assistant still has various regressions compared to Google Now
   if ! grep -q "ro.opa.eligible_device=" /system/build.prop; then
     echo "ro.opa.eligible_device=true" >> /system/build.prop
   fi
-  sed -i "\:# Apply build.prop changes (from GApps Installer):a \    if ! grep -q \"ro.opa.eligible_device=\" /system/build.prop; then echo \"ro.opa.eligible_device=true\" >> \$SYS/build.prop; fi" $bkup_tail
+  sed -i "\\:# Apply build.prop changes (from GApps Installer):a \\    if ! grep -q \"ro.opa.eligible_device=\" /system/build.prop; then echo \"ro.opa.eligible_device=true\" >> \$SYS/build.prop; fi" $bkup_tail
 fi
 
 # Create Markup lib symlink if installed
@@ -2668,8 +2668,8 @@ if ( contains "$gapps_list" "markup" ); then
   install -d "/system/app/MarkupGoogle/lib/$arch"
   ln -sfn "/system/$libfolder/$markup_lib_filename" "/system/app/MarkupGoogle/lib/$arch/$markup_lib_filename"
   # Add same code to backup script to ensure symlinks are recreated on addon.d restore
-  sed -i "\:# Recreate required symlinks (from GApps Installer):a \    ln -sfn \"/system/$libfolder/$markup_lib_filename\" \"/system/app/MarkupGoogle/lib/$arch/$markup_lib_filename\"" $bkup_tail
-  sed -i "\:# Recreate required symlinks (from GApps Installer):a \    install -d \"/system/app/MarkupGoogle/lib/$arch\"" $bkup_tail
+  sed -i "\\:# Recreate required symlinks (from GApps Installer):a \\    ln -sfn \"/system/$libfolder/$markup_lib_filename\" \"/system/app/MarkupGoogle/lib/$arch/$markup_lib_filename\"" $bkup_tail
+  sed -i "\\:# Recreate required symlinks (from GApps Installer):a \\    install -d \"/system/app/MarkupGoogle/lib/$arch\"" $bkup_tail
 fi
 
 @tvremotelibsymlink@
@@ -2684,20 +2684,20 @@ cp -f "$TMP/g.prop" "$g_prop"
 set_progress 0.80
 other_list=$(echo "${other_list}" | sort -r) # reverse sort list for more readable output
 for other_name in $other_list; do
-  sed -i "\:# Remove 'other' apps (per installer.data):a \    rm -rf \$SYS/$other_name" $bkup_tail
+  sed -i "\\:# Remove 'other' apps (per installer.data):a \\    rm -rf \$SYS/$other_name" $bkup_tail
 done
 
 # Add 'priv-app' Removals to addon.d script
 privapp_list=$(echo "${privapp_list}" | sort -r) # reverse sort list for more readable output
 for privapp_name in $privapp_list; do
-  sed -i "\:# Remove 'priv-app' apps from 'app' (per installer.data):a \    rm -rf \$SYS/$privapp_name" $bkup_tail
+  sed -i "\\:# Remove 'priv-app' apps from 'app' (per installer.data):a \\    rm -rf \$SYS/$privapp_name" $bkup_tail
 done
 
 # Add 'required' Removals to addon.d script
 reqd_list=$(echo "${reqd_list}" | sort -r) # reverse sort list for more readable output
 for reqdapp_name in $reqd_list; do
   reqdapp_name=$(echo ${reqdapp_name/\/system/\$SYS})
-  sed -i "\:# Remove 'required' apps (per installer.data):a \    rm -rf $reqdapp_name" $bkup_tail
+  sed -i "\\:# Remove 'required' apps (per installer.data):a \\    rm -rf $reqdapp_name" $bkup_tail
 done
 
 # Create final addon.d script in system
@@ -2708,7 +2708,7 @@ bkup_header="#!/sbin/sh
 # /system/addon.d/70-gapps.sh
 #
 . /tmp/backuptool.functions
-\n
+\\n
 if [ -z \$backuptool_ab ]; then
   SYS=\$S
   TMP="/tmp"
@@ -2716,7 +2716,7 @@ else
   SYS="/postinstall/system"
   TMP="/postinstall/tmp"
 fi
-\n
+\\n
 list_files() {
 cat <<EOF"
 bkup_list="$bkup_list${newline}etc/g.prop" # add g.prop to backup list
@@ -2766,7 +2766,7 @@ if ( contains "$gapps_list" "dialergoogle" ); then
         test "$i" -gt "$max" && max="$i"
       done
       entry='<setting id="'"$((max + 1))"'" name="dialer_default_application" value="com.google.android.dialer" package="android" />\r'
-      sed -i "/<settings version=\"/a\ \ ${entry}" "$setsec"
+      sed -i "/<settings version=\"/a\\ \\ ${entry}" "$setsec"
     fi
   else
     if [ ! -d "/data/system/users/0" ]; then
@@ -2775,7 +2775,7 @@ if ( contains "$gapps_list" "dialergoogle" ); then
       chmod -R 775 "/data/system"
       chmod 700 "/data/system/users/0"
     fi
-    { echo -e "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\r"
+    { echo -e "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\\r"
     echo -e '<settings version="'$setver'">\r'
     echo -e '  <setting id="1" name="dialer_default_application" value="com.google.android.dialer" package="android" />\r'
     echo -e '</settings>'; } > "$setsec"
