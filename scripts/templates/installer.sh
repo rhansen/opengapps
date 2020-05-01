@@ -1365,7 +1365,7 @@ odexapk() {
       dex="LD_LIBRARY_PATH='/system/lib:/system/lib64' /system/bin/dex2oat"
       for d in $dexfiles; do
         dex="$dex --dex-file=\"$d\""
-        bkup_list="$newline${d#\/system\/}${bkup_list}"  # Backup the dex for re-generating oat in the future
+        bkup_list="$newline${d#/system/}${bkup_list}"  # Backup the dex for re-generating oat in the future
       done
       dex="install -d \"$apkdir/oat/$req_android_arch\" && $dex --instruction-set=\"$req_android_arch\" --oat-file=\"$apkdir/oat/$req_android_arch/$apkname.odex\""
       eval "$dex"
