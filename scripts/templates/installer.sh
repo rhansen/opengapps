@@ -1188,6 +1188,7 @@ bkup_pre_restore=""
 bkup_pre_restore_user_apps=""
 gapps_removal_list=$TMP/gapps-remove.txt
 g_log=$TMP/g.log
+rm -f "$g_log"
 calc_log=$TMP/calc.log
 conflicts_log=$TMP/conflicts.log
 rec_cache_log=/cache/recovery/log
@@ -1751,7 +1752,7 @@ else
   device_type=phone
 fi
 
-echo "# Begin Open GApps Install Log" > $g_log
+echo "# Begin Open GApps Install Log" >> $g_log
 echo ------------------------------------------------------------------ >> $g_log
 
 # Check to make certain user has proper version ROM Installed
