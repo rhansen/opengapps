@@ -2711,10 +2711,10 @@ bkup_header="#!/sbin/sh
 
 if [ -z \$backuptool_ab ]; then
   SYS=\$S
-  TMP="/tmp"
+  TMP=\"/tmp\"
 else
-  SYS="/postinstall/system"
-  TMP="/postinstall/tmp"
+  SYS=\"/postinstall/system\"
+  TMP=\"/postinstall/tmp\"
 fi
 
 list_files() {
