@@ -22,7 +22,7 @@ camerav3compatibilityhack(){
     echo '
 # Google Camera fallback to Legacy if incompatible with new Camera API
 case $newcamera_compat in
-  false*) gapps_list=${gapps_list/cameragoogle/cameragooglelegacy}; log "Google Camera version" "Legacy";;
+  false*) gapps_list=${gapps_list/cameragoogle/cameragooglelegacy}; clog "Google Camera version" "Legacy";;
 esac'
   fi
 }

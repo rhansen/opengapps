@@ -23,6 +23,16 @@ newline='
 '
 
 # _____________________________________________________________________________________________________________________
+#                                             Set up logging
+g_log=$TMP/g.log
+exec 2>$g_log # send stderr to the log
+tolog() { cat >&2; }
+log() { printf %s\\n "$*" | tolog; }
+clog() { printf "%31s | %s\\n" "$1" "$2" | tolog; }
+log "# Begin Open GApps Install Log"
+log ------------------------------------------------------------------
+
+# _____________________________________________________________________________________________________________________
 #                                             Define Current Package Variables
 # List of GApps packages that can be installed with this installer
 pkg_names="@SUPPORTEDVARIANTS@"
@@ -1187,8 +1197,6 @@ bkup_post_restore=""
 bkup_pre_restore=""
 bkup_pre_restore_user_apps=""
 gapps_removal_list=$TMP/gapps-remove.txt
-g_log=$TMP/g.log
-rm -f "$g_log"
 calc_log=$TMP/calc.log
 conflicts_log=$TMP/conflicts.log
 rec_cache_log=/cache/recovery/log
@@ -1425,7 +1433,7 @@ install_extracted() {
       for installedapkpath in $installedapkpaths; do  # TODO fix spaces-handling
         if ! checkmanifest "/system/$installedapkpath" "classes.dex"; then
           ui_print "- pre-ODEX-ing $gapp_name"
-          log "pre-ODEX-ing" "$gapp_name"
+          clog "pre-ODEX-ing" "$gapp_name"
           odexapk "/system/$installedapkpath"
         fi
       done
@@ -1433,10 +1441,6 @@ install_extracted() {
   esac
   bkup_list="$newline${file_list}${bkup_list}"
   rm -rf "$TMP/$1"
-}
-
-log() {
-  printf "%31s | %s\\n" "$1" "$2" >> $g_log
 }
 
 log_add() {
@@ -1480,47 +1484,47 @@ odexapk() {
 quit() {
   set_progress 0.94
   install_note=$(echo "${install_note}" | sort -r | sed '/^$/d') # sort Installation Notes & remove empty lines
-  echo ------------------------------------------------------------------ >> $g_log
-  echo "$log_close" >> $g_log
+  log ------------------------------------------------------------------
+  log "$log_close"
 
   # Add Installation Notes to log to help user better understand conflicts/errors
   for note in $install_note; do
     eval "error_msg=\$${note}"
-    echo "$error_msg" >> $g_log
+    log "$error_msg"
   done
 
   # Add User App Removals NotFound Log if it exists
   if [ -r $user_remove_notfound_log ]; then
-    echo "$user_notfound_msg" >> $g_log
-    echo "# Begin User App Removals NOT Found (from gapps-config)" >> $g_log
-    cat $user_remove_notfound_log >> $g_log
+    log "$user_notfound_msg"
+    log "# Begin User App Removals NOT Found (from gapps-config)"
+    tolog <$user_remove_notfound_log
     rm -f $user_remove_notfound_log
-    echo "# End User App Removals NOT Found (from gapps-config)$newline" >> $g_log
+    log "# End User App Removals NOT Found (from gapps-config)$newline"
   fi
   # Add User App Removals MultipleFound Log if it exists
   if [ -r $user_remove_multiplefound_log ]; then
-    echo "$user_multiplefound_msg" >> $g_log
-    echo "# Begin User App Removals MULTIPLE Found (from gapps-config)" >> $g_log
-    cat $user_remove_multiplefound_log >> $g_log
+    log "$user_multiplefound_msg"
+    log "# Begin User App Removals MULTIPLE Found (from gapps-config)"
+    tolog <$user_remove_multiplefound_log
     rm -f $user_remove_multiplefound_log
-    echo "# End User App Removals MULTIPLE Found (from gapps-config)$newline" >> $g_log
+    log "# End User App Removals MULTIPLE Found (from gapps-config)$newline"
   fi
 
   # Add Duplicate Files Log if it exists
   if [ -r $conflicts_log ]; then
-    echo "$del_conflict_msg" >> $g_log
-    echo "# Begin GApps <> ROM Duplicate File List" >> $g_log
-    cat $conflicts_log >> $g_log
+    log "$del_conflict_msg"
+    log "# Begin GApps <> ROM Duplicate File List"
+    tolog <$conflicts_log
     rm -f $conflicts_log
-    echo "# End GApps <> ROM Duplicate File List$newline" >> $g_log
+    log "# End GApps <> ROM Duplicate File List$newline"
   fi
 
   # Add Installation Calculations to the log if they were performed
   if [ -r $calc_log ]; then
-    echo "# Begin GApps Size Calculations" >> $g_log
-    cat $calc_log >> $g_log
+    log "# Begin GApps Size Calculations"
+    tolog <$calc_log
     rm -f $calc_log
-    echo "$newline# End GApps Size Calculations" >> $g_log
+    log "$newline# End GApps Size Calculations"
   fi
 
   # Add list of Raw User Application Removals back to end of processed gapps-config for display in gapps log
@@ -1532,19 +1536,19 @@ quit() {
 
   set_progress 0.96
   # Add gapps-config information to the log
-  echo "$newline# Begin User's gapps-config" >> $g_log
+  log "$newline# Begin User's gapps-config"
   if [ "$g_conf" ]; then
-    cat "$g_conf" >> $g_log
+    tolog <$g_conf
+    log ""
   else
-    echo -n "   *** NOT USED ***" >> $g_log
+    log "   *** NOT USED ***"
   fi
-  echo "$newline# End User's gapps-config" >> $g_log
+  log "# End User's gapps-config"
 
   # Copy logs to proper folder (Same as gapps-config or same as Zip)
   ui_print "- Copying Log to $log_folder"
   ui_print " "
   cp -f $g_log "$log_folder/open_gapps_log.txt"
-  rm -f $g_log
   set_progress 0.97
 }
 
@@ -1752,9 +1756,6 @@ else
   device_type=phone
 fi
 
-echo "# Begin Open GApps Install Log" >> $g_log
-echo ------------------------------------------------------------------ >> $g_log
-
 # Check to make certain user has proper version ROM Installed
 if [ ! "$rom_build_sdk" = "$req_android_sdk" ]; then
   ui_print "*** Incompatible Android ROM detected ***"
@@ -1957,41 +1958,41 @@ case $device_name in
   *) googlepixel_compat="false";;
 esac
 
-log "ROM Android version" "$(get_prop "ro.build.version.release")"
-log "ROM Build ID" "$(get_prop "ro.build.display.id")"
-log "ROM Version increment" "$(get_prop "ro.build.version.incremental")"
-log "ROM SDK version" "$rom_build_sdk"
-log "ROM/Recovery modversion" "$(get_prop "ro.modversion")"
-log "Device Recovery" "$recovery"
-log "Device Name" "$device_name"
-log "Device Model" "$device_model"
-log "Device Type" "$device_type"
-log "Device CPU" "$device_architecture"
-log "Device A/B-partitions" "$device_abpartition"
-log "Installer Platform" "$BINARCH"
-log "ROM Platform" "$arch"
-log "Display Density Used" "$density"
-log "Install Type" "$install_type"
-log "Smart ART Pre-ODEX" "$preodex"
-log "Google Camera already installed" "$cameragoogle_inst"
-log "VRMode Compatible" "$vrmode_compat"
-log "Google Camera Compatible" "$cameragoogle_compat"
-log "New Camera API Compatible" "$newcamera_compat"
-log "Google Pixel Features" "$googlepixel_compat"
+clog "ROM Android version" "$(get_prop "ro.build.version.release")"
+clog "ROM Build ID" "$(get_prop "ro.build.display.id")"
+clog "ROM Version increment" "$(get_prop "ro.build.version.incremental")"
+clog "ROM SDK version" "$rom_build_sdk"
+clog "ROM/Recovery modversion" "$(get_prop "ro.modversion")"
+clog "Device Recovery" "$recovery"
+clog "Device Name" "$device_name"
+clog "Device Model" "$device_model"
+clog "Device Type" "$device_type"
+clog "Device CPU" "$device_architecture"
+clog "Device A/B-partitions" "$device_abpartition"
+clog "Installer Platform" "$BINARCH"
+clog "ROM Platform" "$arch"
+clog "Display Density Used" "$density"
+clog "Install Type" "$install_type"
+clog "Smart ART Pre-ODEX" "$preodex"
+clog "Google Camera already installed" "$cameragoogle_inst"
+clog "VRMode Compatible" "$vrmode_compat"
+clog "Google Camera Compatible" "$cameragoogle_compat"
+clog "New Camera API Compatible" "$newcamera_compat"
+clog "Google Pixel Features" "$googlepixel_compat"
 
 # Determine if a GApps package is installed and
 # the version, type, and whether it's an Open GApps package
 if [ -e "/system/priv-app/GoogleServicesFramework/GoogleServicesFramework.apk" ] || [ -e "/system/product/priv-app/GoogleServicesFramework/GoogleServicesFramework.apk" ] || [ -e "/system/priv-app/GoogleServicesFramework.apk" ] || [ -e "/system/product/priv-app/GoogleServicesFramework.apk" ]; then
   openversion="$(get_prop "ro.addon.open_version")"
   if [ -n "$openversion" ]; then
-    log "Current GApps Version" "$openversion"
+    clog "Current GApps Version" "$openversion"
     opentype="$(get_prop "ro.addon.open_type")"
     if [ -z "$opentype" ]; then
       opentype="unknown"
     fi
-    log "Current Open GApps Package" "$opentype"
+    clog "Current Open GApps Package" "$opentype"
   elif [ -e "/system/etc/g.prop" ]; then
-    log "Current GApps Version" "NON Open GApps Package Currently Installed (FAILURE)"
+    clog "Current GApps Version" "NON Open GApps Package Currently Installed (FAILURE)"
     ui_print "* Incompatible GApps Currently Installed *"
     ui_print " "
     ui_print "This Open GApps package can ONLY be installed"
@@ -2006,7 +2007,7 @@ if [ -e "/system/priv-app/GoogleServicesFramework/GoogleServicesFramework.apk" ]
     install_note="${install_note}non_open_gapps_msg$newline"
     abort "$E_NONOPEN"
   else
-    log "Current GApps Version" "Stock ROM GApps Currently Installed (NOTICE)"
+    clog "Current GApps Version" "Stock ROM GApps Currently Installed (NOTICE)"
     ui_print "* Stock ROM GApps Currently Installed *"
     ui_print " "
     ui_print "The installer detected that Stock ROM GApps are"
@@ -2022,7 +2023,7 @@ if [ -e "/system/priv-app/GoogleServicesFramework/GoogleServicesFramework.apk" ]
   fi
 else
   # User does NOT have a GApps package installed on their device
-  log "Current GApps Version" "No GApps Installed"
+  clog "Current GApps Version" "No GApps Installed"
 
   # Did this 6.0+ system already boot and generated runtime permissions
   if [ -e /data/system/users/0/runtime-permissions.xml ]; then
@@ -2030,7 +2031,7 @@ else
     if ! grep -q "com.google.android.setupwizard" /data/system/users/*/runtime-permissions.xml; then
       # Purge the runtime permissions to prevent issues if flashing GApps for the first time on a dirty install
       rm -f /data/system/users/*/runtime-permissions.xml
-      log "Runtime Permissions" "Reset"
+      clog "Runtime Permissions" "Reset"
     fi
   fi
 
@@ -2502,25 +2503,25 @@ full_removal_list=$(echo "${full_removal_list}" | sed '/^$/d') # Remove empty li
 remove_list=$(echo "${remove_list}" | sed '/^$/d') # Remove empty lines from remove_list
 user_remove_folder_list=$(echo "${user_remove_folder_list}" | sed '/^$/d') # Remove empty lines from User Application Removal list
 
-log "Installing GApps Zipfile" "$OPENGAZIP"
-log "Installing GApps Version" "$gapps_version"
-log "Installing GApps Type" "$gapps_type"
-log "Config Type" "$config_type"
-log "Using gapps-config" "$config_file"
-log "Remove Stock/AOSP Browser" "$remove_browser"
-log "Remove Stock/AOSP Camera" "$remove_camerastock"
-log "Remove Stock/AOSP Dialer" "$remove_dialerstock"
-log "Remove Stock/AOSP Email" "$remove_email"
-log "Remove Stock/AOSP Gallery" "$remove_gallery"
-log "Remove Stock/AOSP Launcher" "$remove_launcher"
-log "Remove Stock/AOSP MMS App" "$remove_mms"
-log "Remove Stock/AOSP Pico TTS" "$remove_picotts"
-log "Ignore Google Contacts" "$ignoregooglecontacts"
-log "Ignore Google Dialer" "$ignoregoogledialer"
-log "Ignore Google Keyboard" "$ignoregooglekeyboard"
-log "Ignore Google Package Installer" "$ignoregooglepackageinstaller"
-log "Ignore Google NFC Tag" "$ignoregoogletag"
-log "Ignore Google WebView" "$ignoregooglewebview"
+clog "Installing GApps Zipfile" "$OPENGAZIP"
+clog "Installing GApps Version" "$gapps_version"
+clog "Installing GApps Type" "$gapps_type"
+clog "Config Type" "$config_type"
+clog "Using gapps-config" "$config_file"
+clog "Remove Stock/AOSP Browser" "$remove_browser"
+clog "Remove Stock/AOSP Camera" "$remove_camerastock"
+clog "Remove Stock/AOSP Dialer" "$remove_dialerstock"
+clog "Remove Stock/AOSP Email" "$remove_email"
+clog "Remove Stock/AOSP Gallery" "$remove_gallery"
+clog "Remove Stock/AOSP Launcher" "$remove_launcher"
+clog "Remove Stock/AOSP MMS App" "$remove_mms"
+clog "Remove Stock/AOSP Pico TTS" "$remove_picotts"
+clog "Ignore Google Contacts" "$ignoregooglecontacts"
+clog "Ignore Google Dialer" "$ignoregoogledialer"
+clog "Ignore Google Keyboard" "$ignoregooglekeyboard"
+clog "Ignore Google Package Installer" "$ignoregooglepackageinstaller"
+clog "Ignore Google NFC Tag" "$ignoregoogletag"
+clog "Ignore Google WebView" "$ignoregooglewebview"
 
 # _____________________________________________________________________________________________________________________
 #                                                  Perform space calculations
@@ -2557,9 +2558,9 @@ esac
 total_system_size_kb=$(echo "$df" | awk '{ print $1 }')
 used_system_size_kb=$(echo "$df" | awk '{ print $2 }')
 free_system_size_kb=$(echo "$df" | awk '{ print $3 }')
-log "Total System Size (KB)" "$total_system_size_kb"
-log "Used System Space (KB)" "$used_system_size_kb"
-log "Current Free Space (KB)" "$free_system_size_kb"
+clog "Total System Size (KB)" "$total_system_size_kb"
+clog "Used System Space (KB)" "$used_system_size_kb"
+clog "Current Free Space (KB)" "$free_system_size_kb"
 
 # Perform storage space calculations of existing GApps that will be deleted/replaced
 reclaimed_gapps_space_kb=$(du -ck $(complete_gapps_list) | tail -n 1 | awk '{ print $1 }')
@@ -2637,11 +2638,11 @@ echo ------------------------------------------------------------------ >> $calc
 
 if [ "$post_install_size_kb" -ge 0 ]; then
   printf "%47s | %7d\\n" "  Post Install Free Space" $post_install_size_kb >> $calc_log
-  log "Post Install Free Space (KB)" "$post_install_size_kb   << See Calculations Below"
+  clog "Post Install Free Space (KB)" "$post_install_size_kb   << See Calculations Below"
 else
   additional_size_kb=$((post_install_size_kb * -1))
   printf "%47s | %7d\\n" "Additional Space Required" $additional_size_kb >> $calc_log
-  log "Additional Space Required (KB)" "$additional_size_kb   << See Calculations Below"
+  clog "Additional Space Required (KB)" "$additional_size_kb   << See Calculations Below"
 fi
 
 # Finish up Calculation Log
