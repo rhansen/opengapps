@@ -1074,10 +1074,12 @@ fi
 
 # _____________________________________________________________________________________________________________________
 #                                                  Declare Variables
+install_note=""
 zip_folder="$(dirname "$OPENGAZIP")"
 g_prop=/system/etc/g.prop
 PROPFILES="$g_prop /system/default.prop /system/build.prop /system/product/build.prop /vendor/build.prop /product/build.prop /system_root/default.prop /system_root/build.prop /system_root/product/build.prop /data/local.prop /default.prop /build.prop"
 bkup_tail=$TMP/bkup_tail.sh
+bkup_list=""
 gapps_removal_list=$TMP/gapps-remove.txt
 g_log=$TMP/g.log
 calc_log=$TMP/calc.log
