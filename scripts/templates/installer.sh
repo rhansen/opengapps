@@ -981,6 +981,7 @@ get_file_prop() {
 set_progress() { echo "set_progress $1" >> $OUTFD; }
 
 ui_print() {
+  clog "ui_print" "$1"
   echo "ui_print $1
     ui_print" >> $OUTFD
 }
