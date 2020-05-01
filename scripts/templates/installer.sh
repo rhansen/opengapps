@@ -2708,7 +2708,7 @@ bkup_header="#!/sbin/sh
 # /system/addon.d/70-gapps.sh
 #
 . /tmp/backuptool.functions
-\\n
+
 if [ -z \$backuptool_ab ]; then
   SYS=\$S
   TMP="/tmp"
@@ -2716,7 +2716,7 @@ else
   SYS="/postinstall/system"
   TMP="/postinstall/tmp"
 fi
-\\n
+
 list_files() {
 cat <<EOF"
 bkup_list="$bkup_list${newline}etc/g.prop" # add g.prop to backup list
