@@ -62,7 +62,7 @@ pushd "$TOP" > /dev/null
 for module in $modules; do
   git submodule update --init --remote $depth -- "sources/$module" # --rebase is specifed in .gitmodules
   if [ $? -ne 0 ]; then
-    echo "ERROR during git execution, aborted!"
+    echo "ERROR during git execution, aborted!" >&2
     exit 1
   fi
 done

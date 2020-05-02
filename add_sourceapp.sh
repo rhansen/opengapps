@@ -69,7 +69,7 @@ installapk() {
           install -D "$apk" "$target/$versioncode.apk"
           echo "Replaced with $target/$versioncode.apk"
         else
-          echo "ERROR: APK is not newer than existing"
+          echo "ERROR: APK is not newer than existing" >&2
         fi
         break
       fi
@@ -91,7 +91,7 @@ addapk() {
         package="$package.$product"
       fi
     else
-      echo "ERROR: Failed to retrieve SetupWizard product-type of $apk"
+      echo "ERROR: Failed to retrieve SetupWizard product-type of $apk" 2>&1
       return 1
     fi
   fi
@@ -132,9 +132,9 @@ addapk() {
   if [ "$verified" != 0 ]; then
     case "$verified" in
       $INCOMPLETEFILES) echo "ERROR: The following files were mentioned in the signed manifest of $apk but are not present in the APK:
-$notinzip";;
-      $INVALIDCERT)     echo "ERROR: $apk contains files or a certificate not signed by Google. APK not imported";;
-      $UNSIGNEDFILES)   echo "ERROR: Unsigned or incomplete APKs are not allowed. APK is not imported.";;
+$notinzip" >&2;;
+      $INVALIDCERT)     echo "ERROR: $apk contains files or a certificate not signed by Google. APK not imported" >&2;;
+      $UNSIGNEDFILES)   echo "ERROR: Unsigned or incomplete APKs are not allowed. APK is not imported." >&2;;
     esac
     return 1
   fi
@@ -178,7 +178,7 @@ addlib() {
   echo "For which API level should $path be installed? [#]"
   IFS= read -r REPLY
   case "$REPLY" in
-    (*[!0-9]*|'') echo "ERROR: $REPLY is not a valid API level";;
+    (*[!0-9]*|'') echo "ERROR: $REPLY is not a valid API level" >&2;;
     (*)           install -D "$lib" "$SOURCES/$architecture/$prefix$libfolder/$REPLY/$libname"
                   echo "SUCCESS: Added $libname to $architecture/$prefix$libfolder/$REPLY/";;
   esac
@@ -201,16 +201,16 @@ for argument in "$@"; do
         if aapt dump configurations "$file" >/dev/null; then
           addapk "$file"
         else
-          echo "ERROR: File $file not a valid APK!"
+          echo "ERROR: File $file not a valid APK!" >&2
         fi;;
       *x86-64*)       addlib "$file" "x86_64";;
       *aarch64*)      addlib "$file" "arm64";;
       *32-bit*intel*) addlib "$file" "x86";;
       *32-bit*arm*)   addlib "$file" "arm";;
-      *)              echo "ERROR: File $file has an unrecognized filetype!";;
+      *)              echo "ERROR: File $file has an unrecognized filetype!" >&2;;
     esac
   else
-    echo "ERROR: File $file does not exist!"
+    echo "ERROR: File $file does not exist!" >&2
   fi
 done
 

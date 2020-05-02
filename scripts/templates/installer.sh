@@ -1104,7 +1104,7 @@ umount_all() {
 #                                                  Gather Pre-Install Info
 # Are we on an Android device is or is a really stupid person running this script on their computer?
 if [ -e "/etc/lsb-release" ] || [ -n "$OSTYPE" ]; then
-  echo "Don't run this on your computer! You need to flash the Open GApps zip on an Android Recovery!"
+  echo "Don't run this on your computer! You need to flash the Open GApps zip on an Android Recovery!" >&2
   exit 1
 fi
 
@@ -1255,7 +1255,7 @@ extract_app() {
     echo "Found $1 DPI path: $dpiapkpath"
     folder_extract "$tarpath" "$dpiapkpath" "$app_name/common"
   else
-    echo "Failed to extract $1.tar* from $OPENGAZIP"
+    echo "Failed to extract $1.tar* from $OPENGAZIP" >&2
   fi
 }
 

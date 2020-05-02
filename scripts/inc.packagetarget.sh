@@ -149,7 +149,7 @@ compressapp() {
           tar --remove-files -cf "$1.tar" "$1"
         }
     ;;
-    *)  echo "ERROR: Unsupported compression method! Aborting..."; exit 1;;
+    *)  echo "ERROR: Unsupported compression method! Aborting..." >&2; exit 1;;
   esac
   hash="$(tar -cf - "$2" | md5sum | cut -f1 -d' ')"
 
@@ -166,7 +166,7 @@ compressapp() {
     fi
     compress "$2"
     if [ $? != 0 ]; then
-      echo "ERROR: compressing $1$2 failed, aborting."
+      echo "ERROR: compressing $1$2 failed, aborting." >&2
       exit 1
     fi
     cp "$2.tar$csuf" "$CACHE/$hash.tar$csuf" #copy into the cache
@@ -191,7 +191,7 @@ createzip() {
   fi
 
   if [ $MEMORY = 0 ] || [ $MEMORY -lt $MEMORY_MIN ]; then
-    echo "WARNING: Can't establish if enough free memory is available: parallel compression mode disabled."
+    echo "WARNING: Can't establish if enough free memory is available: parallel compression mode disabled." >&2
     MEMORY=0
     THREADS=1
   fi
@@ -224,7 +224,7 @@ createzip() {
             tries=$((tries+1))
             # If we are trying for more then 180*5 seconds, we bail out (in case machine is to low on memory or CPU we won't run forever!)
             if [ $tries -gt 180 ]; then
-              echo "ERROR: Seems like this machine is too slow or was unable to collect enought usable memory for compression, aborting."
+              echo "ERROR: Seems like this machine is too slow or was unable to collect enought usable memory for compression, aborting." >&2
               exit 1
             fi
             continue
@@ -294,7 +294,7 @@ signzip() {
     rm "$unsignedzip"
   else
     rm "$signedzip"
-    echo "ERROR: Creating Flashable ZIP-file failed, unsigned file can be found at $unsignedzip"
+    echo "ERROR: Creating Flashable ZIP-file failed, unsigned file can be found at $unsignedzip" >&2
     exit 1
   fi
   echo "SUCCESS: Built Open GApps variation $VARIANT with API $API level for $ARCH as $signedzip"

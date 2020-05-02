@@ -62,7 +62,7 @@ buildfile() {
     if [ "$usearch" != "$fallback_arch" ]; then
       buildfile "$1" "$2" "$3" "$fallback_arch"
     else
-      echo "ERROR: No fallback available. Failed to build file $1"
+      echo "ERROR: No fallback available. Failed to build file $1" >&2
       exit 1
     fi
   fi
@@ -91,7 +91,7 @@ buildframework() {
     if [ "$usearch" != "$fallback_arch" ]; then
       buildframework "$frameworkname" "$ziplocation" "$targetlocation" "$fallback_arch"
     else
-      echo "ERROR: No fallback available. Failed to build framework $frameworkname"
+      echo "ERROR: No fallback available. Failed to build framework $frameworkname" >&2
       exit 1
     fi
   fi
@@ -129,7 +129,7 @@ buildsystemlib() {
     if [ "$usearch" != "$fallback_arch" ]; then
       buildsystemlib "$libname" "$ziplocation" "$targetlocation" "$fallback_arch"
     else
-      echo "ERROR: No fallback available. Failed to build lib $libname"
+      echo "ERROR: No fallback available. Failed to build lib $libname" >&2
       exit 1
     fi
   fi
@@ -211,7 +211,7 @@ buildapp() {
     if [ "$usearch" != "$fallback_arch" ]; then
       buildapp "$package" "$usemaxapi" "$ziplocation" "$targetlocation" "$fallback_arch"
     else
-      echo "ERROR: No fallback available. Failed to build package $package"
+      echo "ERROR: No fallback available. Failed to build package $package" >&2
       exit 1
     fi
   fi
@@ -245,7 +245,7 @@ getapksforapi() {
       for maxsdkapk in $sourceapks; do
         maxsdk="$(aapt dump badging "$maxsdkapk" 2>/dev/null | grep -a "maxSdkVersion:" | sed 's/maxSdkVersion://' | sed "s/'//g")"
         if [ -n "$maxsdk" ] && [ "$maxsdk" -lt "$3" ]; then
-          echo "WARNING: Newest APK found is incompatible with API level $3 for package $1 on $2, maxSdk: $maxsdk, falling back to higher SDK"
+          echo "WARNING: Newest APK found is incompatible with API level $3 for package $1 on $2, maxSdk: $maxsdk, falling back to higher SDK" >&2
           maxsdkerrorapi="$api"
           continue 2
         fi
@@ -256,7 +256,7 @@ getapksforapi() {
   done
   IFS="$OLDIFS"
   if [ -z "$sourceapks" ]; then
-    echo "WARNING: No APK found compatible with API level $3 for package $1 on $2, lowest found: $api"
+    echo "WARNING: No APK found compatible with API level $3 for package $1 on $2, lowest found: $api" >&2
     return 1 #error
   fi
   #$sourceapks and $api have the useful returnvalues
@@ -279,7 +279,7 @@ getframeworkforapi() {
   done
   IFS="$OLDIFS"
   if [ -z "$sourceframework" ]; then
-    #echo "WARNING: No framework found compatible with API level $3 for framework $1 on $2, lowest found: $api"
+    #echo "WARNING: No framework found compatible with API level $3 for framework $1 on $2, lowest found: $api" >&2
     return 1 #error
   fi
   apiframeworkpath="$(echo "$sourceframework" | awk -F'/' '{print $(NF-1)}')" # is api number
@@ -304,7 +304,7 @@ getsystemlibforapi() {
   done
   IFS="$OLDIFS"
   if [ -z "$sourcelib" ]; then
-    #echo "WARNING: No lib found compatible with API level $3 for lib $1 on $2, lowest found: $api"
+    #echo "WARNING: No lib found compatible with API level $3 for lib $1 on $2, lowest found: $api" >&2
     return 1 #error
   fi
   apilibpath="$(echo "$sourcelib" | awk -F'/' '{print $(NF-1)}')" # is api number

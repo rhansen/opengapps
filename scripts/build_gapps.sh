@@ -14,7 +14,7 @@
 
 #Check architecture
 if { [ "$1" != "arm" ] && [ "$1" != "arm64" ] && [ "$1" != "x86" ] && [ "$1" != "x86_64" ]; } || [ -z "$2" ]; then
-  echo "Usage: $0 (arm|arm64|x86|x86_64) API_LEVEL [VARIANT]"
+  echo "Usage: $0 (arm|arm64|x86|x86_64) API_LEVEL [VARIANT]" >&2
   exit 1
 fi
 
@@ -82,13 +82,13 @@ case "$API" in
 28) PLATFORM="9.0" ;;
 29) PLATFORM="10.0" ;;
 *)
-  echo "ERROR: Unknown API version! Aborting..."
+  echo "ERROR: Unknown API version! Aborting..." >&2
   exit 1
   ;;
 esac
 
 if [ "$API" -lt "21" ] && [ "$ARCH" != "arm" ] && [ "$ARCH" != "x86" ]; then
-  echo "ERROR! Platform $ARCH cannot be built on API level $API"
+  echo "ERROR! Platform $ARCH cannot be built on API level $API" >&2
   exit 1
 fi
 
@@ -97,18 +97,18 @@ SUPPORTEDVARIANTS="$supported_variants"
 GAPPSREMOVEVARIANT="$gappsremove_variant"
 
 if [ -z "$SUPPORTEDVARIANTS" ]; then
-  echo "ERROR: Unknown variant! aborting..."
+  echo "ERROR: Unknown variant! aborting..." >&2
   exit 1
 fi
 if [ "$ARCH" != "arm" ] && [ "$ARCH" != "arm64" ]; then #For all non-arm(64) platforms
   case "$VARIANT" in
   aroma)
-    echo "ERROR! Variant $VARIANT cannot be built on a non-arm platform"
+    echo "ERROR! Variant $VARIANT cannot be built on a non-arm platform" >&2
     exit 1
     ;;
   super | stock | full)
     if [ "$API" -lt "21" ]; then
-      echo "ERROR! Variant $VARIANT cannot be built on a non-arm < 5.0 platform"
+      echo "ERROR! Variant $VARIANT cannot be built on a non-arm < 5.0 platform" >&2
       exit 1
     fi
     ;; #because system wide libs will probably not work with libhoudini
@@ -117,7 +117,7 @@ fi
 if [ "$API" -lt "22" ]; then
   case "$VARIANT" in
   super | tvstock | tvmini)
-    echo "ERROR! Variant $VARIANT cannot be built on API level $API"
+    echo "ERROR! Variant $VARIANT cannot be built on API level $API" >&2
     exit 1
     ;;
   esac
