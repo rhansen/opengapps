@@ -999,8 +999,7 @@ mount_apex() {
       *.apex)
         unzip -qo $apex apex_payload.img -d /apex
         mv -f /apex/apex_payload.img $dest.img
-        mount -t ext4 -o ro,noatime $dest.img $dest 2>/dev/null
-        if [ $? != 0 ]; then
+        if ! mount -t ext4 -o ro,noatime $dest.img $dest 2>/dev/null; then
           while [ $num -lt 64 ]; do
             loop=/dev/block/loop$num
             (mknod $loop b 7 $((num * minorx))
@@ -1008,8 +1007,7 @@ mount_apex() {
             num=$((num + 1))
             losetup $loop | grep -q $dest.img && break
           done
-          mount -t ext4 -o ro,loop,noatime $loop $dest
-          if [ $? != 0 ]; then
+          if ! mount -t ext4 -o ro,loop,noatime $loop $dest; then
             losetup -d $loop 2>/dev/null
           fi
         fi
@@ -1051,14 +1049,15 @@ mount_all() {
   case $ANDROID_ROOT in
     /system_root) setup_mountpoint /system;;
     /system)
+      success=false
       if ! is_mounted /system && ! is_mounted /system_root; then
         setup_mountpoint /system_root
-        mount -o ro -t auto /system_root
+        mount -o ro -t auto /system_root && success=true
       elif [ -f /system/system/build.prop ]; then
         setup_mountpoint /system_root
-        mount --move /system /system_root
+        mount --move /system /system_root && success=true
       fi
-      if [ $? != 0 ]; then
+      if ! "$success"; then
         umount /system
         umount -l /system 2>/dev/null
         if [ "$dynamic_partitions" = "true" ]; then
