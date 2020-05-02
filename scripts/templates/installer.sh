@@ -1140,7 +1140,7 @@ set_progress 0.01
 ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
 $BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMODE=true
 
-test "$ANDROID_ROOT" || ANDROID_ROOT=/system
+test -n "$ANDROID_ROOT" || ANDROID_ROOT=/system
 
 dynamic_partitions=`getprop ro.boot.dynamic_partitions`
 
