@@ -2485,7 +2485,13 @@ done
 full_removal_list="$(cat $gapps_removal_list)$newline${obsolete_libs_list}"
 
 # Read in old user removal list from addon.d to allow for persistence
-addond_remove_folder_list=$(sed -e "1,/# Remove 'user requested' apps (from gapps-config)/d" -e '/;;/,$d' -e 's/    rm -rf //' /system/addon.d/70-gapps.sh)
+addond_remove_folder_list=$(
+  ! [ -e /system/addon.d/70-gapps.sh ] || \
+      sed -e "1,/# Remove 'user requested' apps (from gapps-config)/d" \
+          -e '/;;/,$d' \
+          -e 's/    rm -rf //' \
+          /system/addon.d/70-gapps.sh
+)
 
 # Clean up and sort our lists for space calculations and installation
 set_progress 0.04
