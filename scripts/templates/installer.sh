@@ -1223,9 +1223,6 @@ ch_con() {
 checkmanifest() {
   if [ -f "$1" ] && ("$TMP/unzip-$BINARCH" -ql "$1" | grep -q "META-INF/MANIFEST.MF"); then  # strict, only files
     "$TMP/unzip-$BINARCH" -p "$1" "META-INF/MANIFEST.MF" | grep -q "$2"
-    return "$?"
-  else
-    return 0
   fi
 }
 
@@ -1243,15 +1240,11 @@ contains() {
 }
 
 clean_inst() {
-  if [ -f /data/system/packages.xml ] && [ "$forceclean" != "true" ]; then
-    return 1
-  fi
-  return 0
+  [ ! -f /data/system/packages.xml ] || [ "$forceclean" = "true" ]
 }
 
 exists_in_zip(){
   "$TMP/unzip-$BINARCH" -l "$OPENGAZIP" "$1" | grep -q "$1"
-  return $?
 }
 
 extract_app() {
@@ -1355,7 +1348,6 @@ get_apparch() {
     get_fallback_arch "$apparch"
     if [ "$apparch" != "$fallback_arch" ]; then
       get_apparch "$1" "$fallback_arch"
-      return $?
     else
       apparch=""  # No arch-specific package
       return 1
