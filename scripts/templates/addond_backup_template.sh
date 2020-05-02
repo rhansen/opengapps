@@ -1,3 +1,22 @@
+#!/sbin/sh
+#
+# ADDOND_VERSION=2
+#
+# /system/addon.d/70-gapps.sh
+#
+. /tmp/backuptool.functions
+
+if [ -z $backuptool_ab ]; then
+  SYS=$S
+  TMP="/tmp"
+else
+  SYS="/postinstall/system"
+  TMP="/postinstall/tmp"
+fi
+
+list_files() {
+  cat <<EOF
+@bkup_list@
 EOF
 }
 
@@ -46,23 +65,12 @@ case "$1" in
     # Stub
   ;;
   pre-restore)
-    # Remove Stock/AOSP apps (from GApps Installer)
-
-    # Remove 'other' apps (per installer.data)
-
-    # Remove 'priv-app' apps from 'app' (per installer.data)
-
-    # Remove 'required' apps (per installer.data)
-
+@bkup_pre_restore@
     # Remove 'user requested' apps (from gapps-config)
-
+@bkup_pre_restore_user_apps@
   ;;
   post-restore)
-    # Recreate required symlinks (from GApps Installer)
-
-    # Apply build.prop changes (from GApps Installer)
-
-    # Re-pre-ODEX APKs (from GApps Installer)
+@bkup_post_restore@
 
     # Remove any empty folders we may have created during the removal process
     for i in $SYS/app $SYS/priv-app $SYS/vendor/pittpatt $SYS/usr/srec; do

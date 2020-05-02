@@ -23,8 +23,10 @@ alignbuild() {
 }
 
 commonscripts() {
-  copy "$SCRIPTS/bkup_tail.sh" "$build"
-  EXTRACTFILES="$EXTRACTFILES bkup_tail.sh"
+  for f in templates/addond_backup_template.sh inc.subst.sh; do
+    copy "$SCRIPTS/$f" "$build"
+    EXTRACTFILES="$EXTRACTFILES ${f##*/}"
+  done
 
   install -d "$build/META-INF/com/google/android"
   echo "# Dummy file; update-binary is a shell script.">"$build/META-INF/com/google/android/updater-script"

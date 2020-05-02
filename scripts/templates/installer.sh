@@ -1182,8 +1182,11 @@ install_note=""
 zip_folder="$(dirname "$OPENGAZIP")"
 g_prop=/system/etc/g.prop
 PROPFILES="$g_prop /system/default.prop /system/build.prop /system/product/build.prop /vendor/build.prop /product/build.prop /system_root/default.prop /system_root/build.prop /system_root/product/build.prop /data/local.prop /default.prop /build.prop"
-bkup_tail=$TMP/bkup_tail.sh
+bkup_template=$TMP/addond_backup_template.sh
 bkup_list=""
+bkup_post_restore=""
+bkup_pre_restore=""
+bkup_pre_restore_user_apps=""
 gapps_removal_list=$TMP/gapps-remove.txt
 g_log=$TMP/g.log
 calc_log=$TMP/calc.log
@@ -1477,7 +1480,7 @@ odexapk() {
       dex="install -d \"$apkdir/oat/$req_android_arch\" && $dex --instruction-set=\"$req_android_arch\" --oat-file=\"$apkdir/oat/$req_android_arch/$apkname.odex\""
       eval "$dex"
       # Add the dex2oat command to addon.d for re-running during a restore
-      sed -i "\\:# Re-pre-ODEX APKs (from GApps Installer):a \\    $dex" $bkup_tail
+      bkup_post_restore="$bkup_post_restore$newline    $dex"
     fi
   fi
 }
@@ -2690,7 +2693,7 @@ for aosp_name in $aosp_remove_list; do
   list_name=$(echo "${list_name}" | sort -r) # reverse sort list for more readable output
   for file_name in $list_name; do
     rm -rf "/system/$file_name" "/system/product/$file_name"
-    sed -i "\\:# Remove Stock/AOSP apps (from GApps Installer):a \\    rm -rf \$SYS/$file_name" $bkup_tail
+    bkup_pre_restore="$bkup_pre_restore$newline    rm -rf \$SYS/$file_name"
   done
 done
 
@@ -2701,7 +2704,7 @@ user_remove_folder_list=$(echo "${user_remove_folder_list}$newline${addond_remov
 user_remove_folder_list=$(echo "${user_remove_folder_list}" | sort -r) # reverse sort list for more readable output
 for user_app in $user_remove_folder_list; do
   rm -rf "$user_app"
-  sed -i "\\:# Remove 'user requested' apps (from gapps-config):a \\    rm -rf $user_app" $bkup_tail
+  bkup_pre_restore_user_apps="$bkup_pre_restore_user_apps$newline    rm -rf $user_app"
 done
 
 # Remove any empty folders we may have created during the removal process
@@ -2760,14 +2763,14 @@ ui_print " "
 
 # Use Gms (Google Play services) for feedback/bug reporting (instead of org.cyanogenmod.bugreport or others)
 sed -i "s/ro.error.receiver.system.apps=.*/ro.error.receiver.system.apps=com.google.android.gms/g" /system/build.prop
-sed -i "\\:# Apply build.prop changes (from GApps Installer):a \\    sed -i \"s/ro.error.receiver.system.apps=.*/ro.error.receiver.system.apps=com.google.android.gms/g\" \$SYS/build.prop" $bkup_tail
+bkup_post_restore="$bkup_post_restore$newline    sed -i \"s/ro.error.receiver.system.apps=.*/ro.error.receiver.system.apps=com.google.android.gms/g\" \$SYS/build.prop"
 
 # Enable Google Assistant
 if ( grep -qiE '^googleassistant$' "$g_conf" ); then  #TODO this is not enabled by default atm; because Assistant still has various regressions compared to Google Now
   if ! grep -q "ro.opa.eligible_device=" /system/build.prop; then
     echo "ro.opa.eligible_device=true" >> /system/build.prop
   fi
-  sed -i "\\:# Apply build.prop changes (from GApps Installer):a \\    if ! grep -q \"ro.opa.eligible_device=\" /system/build.prop; then echo \"ro.opa.eligible_device=true\" >> \$SYS/build.prop; fi" $bkup_tail
+  bkup_post_restore="$bkup_post_restore$newline    if ! grep -q \"ro.opa.eligible_device=\" /system/build.prop; then echo \"ro.opa.eligible_device=true\" >> \$SYS/build.prop; fi"
 fi
 
 # Create Markup lib symlink if installed
@@ -2775,8 +2778,8 @@ if ( contains "$gapps_list" "markup" ); then
   install -d "/system/app/MarkupGoogle/lib/$arch"
   ln -sfn "/system/$libfolder/$markup_lib_filename" "/system/app/MarkupGoogle/lib/$arch/$markup_lib_filename"
   # Add same code to backup script to ensure symlinks are recreated on addon.d restore
-  sed -i "\\:# Recreate required symlinks (from GApps Installer):a \\    ln -sfn \"/system/$libfolder/$markup_lib_filename\" \"/system/app/MarkupGoogle/lib/$arch/$markup_lib_filename\"" $bkup_tail
-  sed -i "\\:# Recreate required symlinks (from GApps Installer):a \\    install -d \"/system/app/MarkupGoogle/lib/$arch\"" $bkup_tail
+  bkup_post_restore="$bkup_post_restore$newline    install -d \"/system/app/MarkupGoogle/lib/$arch\""
+  bkup_post_restore="$bkup_post_restore$newline    ln -sfn \"/system/$libfolder/$markup_lib_filename\" \"/system/app/MarkupGoogle/lib/$arch/$markup_lib_filename\""
 fi
 
 @tvremotelibsymlink@
@@ -2791,47 +2794,33 @@ cp -f "$TMP/g.prop" "$g_prop"
 set_progress 0.80
 other_list=$(echo "${other_list}" | sort -r) # reverse sort list for more readable output
 for other_name in $other_list; do
-  sed -i "\\:# Remove 'other' apps (per installer.data):a \\    rm -rf \$SYS/$other_name" $bkup_tail
+  bkup_pre_restore="$bkup_pre_restore$newline    rm -rf \$SYS/$other_name"
 done
 
 # Add 'priv-app' Removals to addon.d script
 privapp_list=$(echo "${privapp_list}" | sort -r) # reverse sort list for more readable output
 for privapp_name in $privapp_list; do
-  sed -i "\\:# Remove 'priv-app' apps from 'app' (per installer.data):a \\    rm -rf \$SYS/$privapp_name" $bkup_tail
+  bkup_pre_restore="$bkup_pre_restore$newline    rm -rf \$SYS/$privapp_name"
 done
 
 # Add 'required' Removals to addon.d script
 reqd_list=$(echo "${reqd_list}" | sort -r) # reverse sort list for more readable output
 for reqdapp_name in $reqd_list; do
   reqdapp_name=$(echo ${reqdapp_name/\/system/\$SYS})
-  sed -i "\\:# Remove 'required' apps (per installer.data):a \\    rm -rf $reqdapp_name" $bkup_tail
+  bkup_pre_restore="$bkup_pre_restore$newline    rm -rf $reqdapp_name"
 done
 
 # Create final addon.d script in system
-bkup_header="#!/sbin/sh
-#
-# ADDOND_VERSION=2
-#
-# /system/addon.d/70-gapps.sh
-#
-. /tmp/backuptool.functions
-
-if [ -z \$backuptool_ab ]; then
-  SYS=\$S
-  TMP=\"/tmp\"
-else
-  SYS=\"/postinstall/system\"
-  TMP=\"/postinstall/tmp\"
-fi
-
-list_files() {
-cat <<EOF"
 bkup_list="$bkup_list${newline}etc/g.prop" # add g.prop to backup list
 bkup_list=$(echo "${bkup_list}" | sort -u| sed '/^$/d') # sort list & remove duplicates and empty lines
 install -d /system/addon.d
-echo -e "$bkup_header" > /system/addon.d/70-gapps.sh
-echo -e "$bkup_list" >> /system/addon.d/70-gapps.sh
-cat $bkup_tail >> /system/addon.d/70-gapps.sh
+. "$TMP/inc.subst.sh"
+substitute_vars \
+    bkup_list \
+    bkup_post_restore \
+    bkup_pre_restore \
+    bkup_pre_restore_user_apps \
+    <$bkup_template >/system/addon.d/70-gapps.sh
 
 # _____________________________________________________________________________________________________________________
 #                                                  Fix Permissions

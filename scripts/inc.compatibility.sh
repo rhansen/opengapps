@@ -80,11 +80,11 @@ if ( ! contains "$gapps_list" "keyboardgoogle" ); then
     ln -sfn "/system/product/$libfolder/$keybd_dec_google" "/system/product/app/LatinIME/$libfolder/$arch/$keybd_dec_google"
 
     # Add same code to backup script to ensure symlinks are recreated on addon.d restore
-    sed -i "\\:# Recreate required symlinks (from GApps Installer):a \\    ln -sfn \"\$SYS/$libfolder/$keybd_dec_google\" \"\$SYS/app/LatinIME/$libfolder/$arch/$keybd_dec_google\"" $bkup_tail
-    sed -i "\\:# Recreate required symlinks (from GApps Installer):a \\    ln -sfn \"\$SYS/$libfolder/$keybd_lib_google\" \"\$SYS/app/LatinIME/$libfolder/$arch/$keybd_lib_target\"" $bkup_tail
-    sed -i "\\:# Recreate required symlinks (from GApps Installer):a \\    ln -sfn \"\$SYS/product/$libfolder/$keybd_dec_google\" \"\$SYS/product/app/LatinIME/$libfolder/$arch/$keybd_dec_google\"" $bkup_tail
-    sed -i "\\:# Recreate required symlinks (from GApps Installer):a \\    ln -sfn \"\$SYS/product/$libfolder/$keybd_lib_google\" \"\$SYS/product/app/LatinIME/$libfolder/$arch/$keybd_lib_target\"" $bkup_tail
-    sed -i "\\:# Recreate required symlinks (from GApps Installer):a \\    install -d \"\$SYS/app/LatinIME/$libfolder/$arch\"" $bkup_tail
+    bkup_post_restore="$bkup_post_restore$newline    install -d \"\$SYS/app/LatinIME/$libfolder/$arch\""
+    bkup_post_restore="$bkup_post_restore$newline    ln -sfn \"\$SYS/product/$libfolder/$keybd_lib_google\" \"\$SYS/product/app/LatinIME/$libfolder/$arch/$keybd_lib_target\""
+    bkup_post_restore="$bkup_post_restore$newline    ln -sfn \"\$SYS/product/$libfolder/$keybd_dec_google\" \"\$SYS/product/app/LatinIME/$libfolder/$arch/$keybd_dec_google\""
+    bkup_post_restore="$bkup_post_restore$newline    ln -sfn \"\$SYS/$libfolder/$keybd_lib_google\" \"\$SYS/app/LatinIME/$libfolder/$arch/$keybd_lib_target\""
+    bkup_post_restore="$bkup_post_restore$newline    ln -sfn \"\$SYS/$libfolder/$keybd_dec_google\" \"\$SYS/app/LatinIME/$libfolder/$arch/$keybd_dec_google\""
   else
     ui_print "- Removing swypelibs"
     # remove swypelibs and symlink if any
@@ -132,9 +132,9 @@ if ( ! contains "$gapps_list" "keyboardgoogle" ); then
     ln -sfn "/system/product/$libfolder/$keybd_lib_google" "/system/product/app/LatinIME/$libfolder/$arch/$keybd_lib_target"
 
     # Add same code to backup script to ensure symlinks are recreated on addon.d restore
-    sed -i "\\:# Recreate required symlinks (from GApps Installer):a \\    ln -sfn \"\$SYS/$libfolder/$keybd_lib_google\" \"\$SYS/app/LatinIME/$libfolder/$arch/$keybd_lib_target\"" $bkup_tail
-    sed -i "\\:# Recreate required symlinks (from GApps Installer):a \\    ln -sfn \"\$SYS/product/$libfolder/$keybd_lib_google\" \"\$SYS/product/app/LatinIME/$libfolder/$arch/$keybd_lib_target\"" $bkup_tail
-    sed -i "\\:# Recreate required symlinks (from GApps Installer):a \\    install -d \"\$SYS/app/LatinIME/$libfolder/$arch\"" $bkup_tail
+    bkup_post_restore="$bkup_post_restore$newline    install -d \"\$SYS/app/LatinIME/$libfolder/$arch\""
+    bkup_post_restore="$bkup_post_restore$newline    ln -sfn \"\$SYS/product/$libfolder/$keybd_lib_google\" \"\$SYS/product/app/LatinIME/$libfolder/$arch/$keybd_lib_target\""
+    bkup_post_restore="$bkup_post_restore$newline    ln -sfn \"\$SYS/$libfolder/$keybd_lib_google\" \"\$SYS/app/LatinIME/$libfolder/$arch/$keybd_lib_target\""
   else
     ui_print "- Removing swypelibs"
     # remove swypelibs and symlink if any
@@ -170,8 +170,8 @@ if ( ! contains "$gapps_list" "keyboardgoogle" ); then
     ln -sfn "/system/product/$libfolder/$keybd_lib_google" "/system/product/$libfolder/$keybd_lib_aosp"
 
     # Add same code to backup script to ensure symlinks are recreated on addon.d restore
-    sed -i "\\:# Recreate required symlinks (from GApps Installer):a \\    ln -sfn \"\$SYS/$libfolder/$keybd_lib_google\" \"\$SYS/$libfolder/$keybd_lib_aosp\"" $bkup_tail
-    sed -i "\\:# Recreate required symlinks (from GApps Installer):a \\    ln -sfn \"\$SYS/product/$libfolder/$keybd_lib_google\" \"\$SYS/product/$libfolder/$keybd_lib_aosp\"" $bkup_tail
+    bkup_post_restore="$bkup_post_restore$newline    ln -sfn \"\$SYS/product/$libfolder/$keybd_lib_google\" \"\$SYS/product/$libfolder/$keybd_lib_aosp\""
+    bkup_post_restore="$bkup_post_restore$newline    ln -sfn \"\$SYS/$libfolder/$keybd_lib_google\" \"\$SYS/$libfolder/$keybd_lib_aosp\""
   else
     ui_print "- Removing swypelibs"
     # remove swypelibs

@@ -48,6 +48,8 @@ COMPRESSION="lz" # xz # none # this sets the default compression method, overrid
 #TMPSIGNDIR=""  $ if set to a value, at this location the zip signing temporary file is created
 #ZIPALIGNRECOMPRESS=""  # if set to a non-zero value, APKs will be recompressed with zopfli during zipalign
 ZIPCOMPRESSIONLEVEL="0" # Store only the files in the zip without compressing them (-0 switch): further compression will be useless and will slow down the building process
+# shellcheck source=scripts/inc.subst.sh
+. "$SCRIPTS/inc.subst.sh"
 # shellcheck source=scripts/inc.tools.sh
 . "$SCRIPTS/inc.tools.sh"
 # shellcheck source=scripts/inc.aromadata.sh

@@ -114,24 +114,6 @@ else
 fi' >"$build/$1"
 }
 
-# Reads stdin and for each variable name argument VAR replaces @VAR@
-# with the value of $VAR and prints the result to stdout.
-substitute_vars() {
-  subst_vars_sed=''
-  for subst_var in "$@"; do
-    eval "subst_val=\$$subst_var"
-    # Escape characters that are special in the sed "s" function's
-    # replacement text (ampersand, backslash, and newline). The string
-    # "EOV" is appended to the value and then removed so that trailing
-    # newlines in the variable's value are preserved.
-    subst_val_esc=$(printf %sEOV\\n "$subst_val" | sed -e 's/[&\]/\\&/g;s/.*/&\\/')
-    subst_val_esc=${subst_val_esc%EOV*}
-    subst_vars_sed=$subst_vars_sed"
-s&@$subst_var@&$subst_val_esc&g"
-  done
-  sed -e "$subst_vars_sed"
-}
-
 makeinstallersh() {
   EXTRACTFILES="$EXTRACTFILES $1"
   cameracompatibilityhack=$(cameracompatibilityhack)
@@ -147,8 +129,8 @@ if ( contains "$gapps_list" "tvremote" ); then
   install -d "/system/app/AtvRemoteService/lib/$arch"
   ln -sfn "/system/$libfolder/$atvremote_lib_filename" "/system/app/AtvRemoteService/lib/$arch/$atvremote_lib_filename"
   # Add same code to backup script to ensure symlinks are recreated on addon.d restore
-  sed -i "\:# Recreate required symlinks (from GApps Installer):a \    ln -sfn \"\$SYS/$libfolder/$atvremote_lib_filename\" \"\$SYS/app/AtvRemoteService/lib/$arch/$atvremote_lib_filename\"" $bkup_tail
-  sed -i "\:# Recreate required symlinks (from GApps Installer):a \    install -d \"\$SYS/app/AtvRemoteService/lib/$arch\"" $bkup_tail
+  bkup_post_restore="$bkup_post_restore$newline    install -d \"\$SYS/app/AtvRemoteService/lib/$arch\""
+  bkup_post_restore="$bkup_post_restore$newline    ln -sfn \"\$SYS/$libfolder/$atvremote_lib_filename\" \"\$SYS/app/AtvRemoteService/lib/$arch/$atvremote_lib_filename\""
 fi
 '
   fi
@@ -159,14 +141,14 @@ if ( contains "$gapps_list" "webviewgoogle" ); then
   install -d "/system/app/WebViewGoogle/lib/$arch"
   ln -sfn "/system/$libfolder/$WebView_lib_filename" "/system/app/WebViewGoogle/lib/$arch/$WebView_lib_filename"
   # Add same code to backup script to ensure symlinks are recreated on addon.d restore
-  sed -i "\:# Recreate required symlinks (from GApps Installer):a \    ln -sfn \"/system/$libfolder/$WebView_lib_filename\" \"/system/app/WebViewGoogle/lib/$arch/$WebView_lib_filename\"" $bkup_tail
-  sed -i "\:# Recreate required symlinks (from GApps Installer):a \    install -d \"/system/app/WebViewGoogle/lib/$arch\"" $bkup_tail
+  bkup_post_restore="$bkup_post_restore$newline    install -d \"/system/app/WebViewGoogle/lib/$arch\""
+  bkup_post_restore="$bkup_post_restore$newline    ln -sfn \"/system/$libfolder/$WebView_lib_filename\" \"/system/app/WebViewGoogle/lib/$arch/$WebView_lib_filename\""
   if [ -n "$fbarch" ]; then  # on 64bit we also need to add 32 bit libs
     install -d "/system/app/WebViewGoogle/lib/$fbarch"
     ln -sfn "/system/lib/$WebView_lib_filename" "/system/app/WebViewGoogle/lib/$fbarch/$WebView_lib_filename"
     # Add same code to backup script to ensure symlinks are recreated on addon.d restore
-    sed -i "\:# Recreate required symlinks (from GApps Installer):a \    ln -sfn \"\$SYS/lib/$WebView_lib_filename\" \"/system/app/WebViewGoogle/lib/$fbarch/$WebView_lib_filename\"" $bkup_tail
-    sed -i "\:# Recreate required symlinks (from GApps Installer):a \    install -d \"\$SYS/app/WebViewGoogle/lib/$fbarch\"" $bkup_tail
+    bkup_post_restore="$bkup_post_restore$newline    install -d \"\$SYS/app/WebViewGoogle/lib/$fbarch\""
+    bkup_post_restore="$bkup_post_restore$newline    ln -sfn \"\$SYS/lib/$WebView_lib_filename\" \"/system/app/WebViewGoogle/lib/$fbarch/$WebView_lib_filename\""
   fi
 fi
 '
