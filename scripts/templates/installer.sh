@@ -29,6 +29,13 @@ exec 2>$g_log # send stderr to the log
 tolog() { cat >&2; }
 log() { printf %s\\n "$*" | tolog; }
 clog() { printf "%31s | %s\\n" "$1" "$2" | tolog; }
+logrun() {
+  clog debug "Running '$*'..."
+  if ! "$@"; then
+    clog debug "Command '$*' failed"
+    return 1
+  fi
+}
 log "# Begin Open GApps Install Log"
 log ------------------------------------------------------------------
 
@@ -987,10 +994,10 @@ ui_print() {
 }
 
 setup_mountpoint() {
-  test -L $1 && mv -f $1 ${1}_link
+  test -L $1 && logrun mv -f $1 ${1}_link
   if [ ! -d $1 ]; then
-    rm -f $1
-    mkdir $1
+    logrun rm -f $1
+    logrun mkdir $1
   fi
 }
 
@@ -1005,25 +1012,25 @@ mount_apex() {
   for apex in /system/apex/*; do
     dest=/apex/$(basename $apex .apex)
     test "$dest" = /apex/com.android.runtime.release && dest=/apex/com.android.runtime
-    mkdir -p $dest
+    logrun mkdir -p $dest
     case $apex in
       *.apex)
-        unzip -qo $apex apex_payload.img -d /apex
-        mv -f /apex/apex_payload.img $dest.img
-        if ! mount -t ext4 -o ro,noatime $dest.img $dest 2>/dev/null; then
+        logrun unzip -qo $apex apex_payload.img -d /apex
+        logrun mv -f /apex/apex_payload.img $dest.img
+        if ! logrun mount -t ext4 -o ro,noatime $dest.img $dest 2>/dev/null; then
           while [ $num -lt 64 ]; do
             loop=/dev/block/loop$num
-            (mknod $loop b 7 $((num * minorx))
-            losetup $loop $dest.img) 2>/dev/null
+            (logrun mknod $loop b 7 $((num * minorx))
+            logrun losetup $loop $dest.img) 2>/dev/null
             num=$((num + 1))
-            losetup $loop | grep -q $dest.img && break
+            logrun losetup $loop | grep -q $dest.img && break
           done
-          if ! mount -t ext4 -o ro,loop,noatime $loop $dest; then
-            losetup -d $loop 2>/dev/null
+          if ! logrun mount -t ext4 -o ro,loop,noatime $loop $dest; then
+            logrun losetup -d $loop 2>/dev/null
           fi
         fi
       ;;
-      *) mount -o bind $apex $dest;;
+      *) logrun mount -o bind $apex $dest;;
     esac
   done
   export ANDROID_RUNTIME_ROOT=/apex/com.android.runtime
@@ -1038,24 +1045,24 @@ umount_apex() {
     if [ -f $dest.img ]; then
       loop=$(mount | grep $dest | cut -d" " -f1)
     fi
-    (umount -l $dest
-    losetup -d $loop) 2>/dev/null
+    (logrun umount -l $dest
+    logrun losetup -d $loop) 2>/dev/null
   done
-  rm -rf /apex 2>/dev/null
+  logrun rm -rf /apex 2>/dev/null
   unset ANDROID_RUNTIME_ROOT ANDROID_TZDATA_ROOT BOOTCLASSPATH
 }
 
 mount_all() {
   if ! is_mounted /data; then
-    mount /data
+    logrun mount /data
     UMOUNT_DATA=1
   fi
-  (mount /cache
-  mount -o ro -t auto /persist
-  mount -o ro -t auto /vendor) 2>/dev/null
+  (logrun mount /cache
+  logrun mount -o ro -t auto /persist
+  logrun mount -o ro -t auto /vendor) 2>/dev/null
   setup_mountpoint $ANDROID_ROOT
   if ! is_mounted $ANDROID_ROOT; then
-    mount -o ro -t auto $ANDROID_ROOT 2>/dev/null
+    logrun mount -o ro -t auto $ANDROID_ROOT 2>/dev/null
   fi
   case $ANDROID_ROOT in
     /system_root) setup_mountpoint /system;;
@@ -1063,31 +1070,31 @@ mount_all() {
       success=false
       if ! is_mounted /system && ! is_mounted /system_root; then
         setup_mountpoint /system_root
-        mount -o ro -t auto /system_root && success=true
+        logrun mount -o ro -t auto /system_root && success=true
       elif [ -f /system/system/build.prop ]; then
         setup_mountpoint /system_root
-        mount --move /system /system_root && success=true
+        logrun mount --move /system /system_root && success=true
       fi
       if ! "$success"; then
-        umount /system
-        umount -l /system 2>/dev/null
+        logrun umount /system
+        logrun umount -l /system 2>/dev/null
         if [ "$dynamic_partitions" = "true" ]; then
           test -e /dev/block/mapper/system || local slot=$(getprop ro.boot.slot_suffix 2>/dev/null)
-          mount -o ro -t auto /dev/block/mapper/system$slot /system_root
-          mount -o ro -t auto /dev/block/mapper/vendor$slot /vendor 2>/dev/null
-          mount -o ro -t auto /dev/block/mapper/product$slot /product 2>/dev/null
+          logrun mount -o ro -t auto /dev/block/mapper/system$slot /system_root
+          logrun mount -o ro -t auto /dev/block/mapper/vendor$slot /vendor 2>/dev/null
+          logrun mount -o ro -t auto /dev/block/mapper/product$slot /product 2>/dev/null
         else
           test -e /dev/block/bootdevice/by-name/system || local slot=$(getprop ro.boot.slot_suffix 2>/dev/null)
-          mount -o ro -t auto /dev/block/bootdevice/by-name/system$slot /system_root
+          logrun mount -o ro -t auto /dev/block/bootdevice/by-name/system$slot /system_root
         fi
       fi
     ;;
   esac
   if is_mounted /system_root; then
     if [ -f /system_root/build.prop ]; then
-      mount -o bind /system_root /system
+      logrun mount -o bind /system_root /system
     else
-      mount -o bind /system_root/system /system
+      logrun mount -o bind /system_root/system /system
     fi
   fi
   mount_apex
@@ -1095,19 +1102,19 @@ mount_all() {
 
 umount_all() {
   (umount_apex
-  umount /system
-  umount -l /system
+  logrun umount /system
+  logrun umount -l /system
   if [ -e /system_root ]; then
-    umount /system_root
-    umount -l /system_root
+    logrun umount /system_root
+    logrun umount -l /system_root
   fi
   for p in "/cache" "/persist" "/vendor" "/product"; do
-    umount $p
-    umount -l $p
+    logrun umount $p
+    logrun umount -l $p
   done
   if [ "$UMOUNT_DATA" ]; then
-    umount /data
-    umount -l /data
+    logrun umount /data
+    logrun umount -l /data
   fi) 2>/dev/null
 }
 
@@ -1157,20 +1164,20 @@ dynamic_partitions=`getprop ro.boot.dynamic_partitions`
 
 # emulators can only flash booted and may need /system (on legacy images), or / (on system-as-root images), remounted rw
 if ! $BOOTMODE; then
-  mount -o bind /dev/urandom /dev/random
+  logrun mount -o bind /dev/urandom /dev/random
   umount_all
   mount_all
 fi
 if [ "$dynamic_partitions" = "true" ]; then
   for block in system vendor product; do
     for slot in "" _a _b; do
-      blockdev --setrw /dev/block/mapper/$block$slot 2>/dev/null
+      logrun blockdev --setrw /dev/block/mapper/$block$slot 2>/dev/null
     done
   done
 fi
-mount -o rw,remount -t auto /system || mount -o rw,remount -t auto /
-mount -o rw,remount -t auto /vendor 2>/dev/null
-mount -o rw,remount -t auto /product 2>/dev/null
+logrun mount -o rw,remount -t auto /system || logrun mount -o rw,remount -t auto /
+logrun mount -o rw,remount -t auto /vendor 2>/dev/null
+logrun mount -o rw,remount -t auto /product 2>/dev/null
 
 ui_print " "
 
@@ -1227,7 +1234,7 @@ abort() {
 }
 
 ch_con() {
-  chcon -h u:object_r:system_file:s0 "$1"
+  logrun chcon -h u:object_r:system_file:s0 "$1"
 }
 
 checkmanifest() {
@@ -1259,7 +1266,7 @@ exists_in_zip(){
 
 extract_app() {
   tarpath="$TMP/$1.tar" # NB no suffix specified here
-  if "$TMP/unzip-$BINARCH" -o "$OPENGAZIP" "$1.tar*" -d "$TMP"; then # wildcard for suffix
+  if logrun "$TMP/unzip-$BINARCH" -o "$OPENGAZIP" "$1.tar*" -d "$TMP"; then # wildcard for suffix
     app_name="$(basename "$1")"
     which_dpi "$app_name"
     echo "Found $1 DPI path: $dpiapkpath"
@@ -1276,25 +1283,25 @@ exxit() {
   fi
   if ( ! grep -qiE '^ *nodebug *($|#)+' "$g_conf" ); then
     if [ "$g_conf" ]; then # copy gapps-config files to debug logs folder
-      cp -f "$g_conf_orig" "$TMP/logs/gapps-config_original.txt"
-      cp -f "$g_conf" "$TMP/logs/gapps-config_processed.txt"
+      logrun cp -f "$g_conf_orig" "$TMP/logs/gapps-config_original.txt"
+      logrun cp -f "$g_conf" "$TMP/logs/gapps-config_processed.txt"
     fi
     ls -alZR /system > "$TMP/logs/System_Files_After.txt"
     df -k > "$TMP/logs/Device_Space_After.txt"
-    cp -f "$log_folder/open_gapps_log.txt" "$TMP/logs"
+    logrun cp -f "$log_folder/open_gapps_log.txt" "$TMP/logs"
     for f in $PROPFILES; do
-      cp -f "$f" "$TMP/logs"
+      logrun cp -f "$f" "$TMP/logs"
     done
-    cp -f "/system/addon.d/70-gapps.sh" "$TMP/logs"
-    cp -f "$gapps_removal_list" "$TMP/logs/gapps-remove_revised.txt"
-    cp -f "$rec_cache_log" "$TMP/logs/Recovery_cache.log"
-    cp -f "$rec_tmp_log" "$TMP/logs/Recovery_tmp.log"
+    logrun cp -f "/system/addon.d/70-gapps.sh" "$TMP/logs"
+    logrun cp -f "$gapps_removal_list" "$TMP/logs/gapps-remove_revised.txt"
+    logrun cp -f "$rec_cache_log" "$TMP/logs/Recovery_cache.log"
+    logrun cp -f "$rec_tmp_log" "$TMP/logs/Recovery_tmp.log"
     curLD="$LD_LIBRARY_PATH"
     unset LD_LIBRARY_PATH
     logcat -d -f "$TMP/logs/logcat"
     export LD_LIBRARY_PATH="$curLD"
     cd "$TMP"
-    tar -cz -f "$log_folder/open_gapps_debug_logs.tar.gz" logs/*
+    logrun tar -cz -f "$log_folder/open_gapps_debug_logs.tar.gz" logs/*
     cd /
   fi
 
@@ -1305,15 +1312,15 @@ exxit() {
     umount_all
     (for dir in /apex /system /system_root; do
       if [ -L "${dir}_link" ]; then
-        rmdir $dir
-        mv -f ${dir}_link $dir
+        logrun rmdir $dir
+        logrun mv -f ${dir}_link $dir
       fi
     done
-    umount -l /dev/random) 2>/dev/null
+    logrun umount -l /dev/random) 2>/dev/null
   fi
 
   # Finally, clean up $TMP
-  find $TMP/* -maxdepth 0 ! -path "$rec_tmp_log" -exec rm -rf {} +
+  logrun find $TMP/* -maxdepth 0 ! -path "$rec_tmp_log" -exec rm -rf {} +
 
   ui_print " "
   exit "$1"
@@ -1325,24 +1332,24 @@ folder_extract() {
   if [ -e "$archive.xz" ]; then
     for f in "$@"; do
       if [ "$f" != "unknown" ]; then
-        "$TMP/xzdec-$BINARCH" "$archive.xz" | "$TMP/tar-$BINARCH" -x -C "$TMP" -f - "$f" && install_extracted "$f"
+        logrun "$TMP/xzdec-$BINARCH" "$archive.xz" | logrun "$TMP/tar-$BINARCH" -x -C "$TMP" -f - "$f" && install_extracted "$f"
       fi
     done
-    rm -f "$archive.xz"
+    logrun rm -f "$archive.xz"
   elif [ -e "$archive.lz" ]; then
     for f in "$@"; do
       if [ "$f" != "unknown" ]; then
-        "$TMP/tar-$BINARCH" -xf "$archive.lz" -C "$TMP" "$f" && install_extracted "$f"
+        logrun "$TMP/tar-$BINARCH" -xf "$archive.lz" -C "$TMP" "$f" && install_extracted "$f"
       fi
     done
-    rm -f "$archive.lz"
+    logrun rm -f "$archive.lz"
   elif [ -e "$archive" ]; then
     for f in "$@"; do
       if [ "$f" != "unknown" ]; then
-        "$TMP/tar-$BINARCH" -xf "$archive" -C "$TMP" "$f" && install_extracted "$f"
+        logrun "$TMP/tar-$BINARCH" -xf "$archive" -C "$TMP" "$f" && install_extracted "$f"
       fi
     done
-    rm -f "$archive"
+    logrun rm -f "$archive"
   fi
 }
 
@@ -1420,7 +1427,7 @@ install_extracted() {
   file_list="$(find "$TMP/$1/" -mindepth 1 -type f | cut -d/ -f5-)"
   dir_list="$(find "$TMP/$1/" -mindepth 1 -type d | cut -d/ -f5-)"
   for file in $file_list; do
-      install -D "$TMP/$1/${file}" "/system/${file}"
+      logrun install -D "$TMP/$1/${file}" "/system/${file}"
       ch_con "/system/${file}"
       set_perm 0 0 644 "/system/${file}"
   done
@@ -1441,7 +1448,7 @@ install_extracted() {
     ;;
   esac
   bkup_list="$newline${file_list}${bkup_list}"
-  rm -rf "$TMP/$1"
+  logrun rm -rf "$TMP/$1"
 }
 
 log_add() {
@@ -1462,11 +1469,11 @@ odexapk() {
   if [ -f "$1" ]; then  # strict, only files
     apkdir="$(dirname "$1")"
     apkname="$(basename "$1" ".apk")"  # Take note not to use -s, it is not supported in busybox
-    install -d "$TMP/classesdex"
+    logrun install -d "$TMP/classesdex"
     "$TMP/unzip-$BINARCH" -q -o "$1" "classes*.dex" -d "$TMP/classesdex/"  # extract to temporary location first, to avoid potential disk space shortage
-    eval '$TMP/zip-$BINARCH -d "$1" "classes*.dex"'
-    cp "$TMP/classesdex/"* "$apkdir"
-    rm -rf "$TMP/classesdex/"
+    eval 'logrun $TMP/zip-$BINARCH -d "$1" "classes*.dex"'
+    logrun cp "$TMP/classesdex/"* "$apkdir"
+    logrun rm -rf "$TMP/classesdex/"
     dexfiles="$(find "$apkdir" -name "classes*.dex")"
     if [ -n "$dexfiles" ]; then
       dex="LD_LIBRARY_PATH='/system/lib:/system/lib64' /system/bin/dex2oat"
@@ -1475,7 +1482,7 @@ odexapk() {
         bkup_list="$newline${d#/system/}${bkup_list}"  # Backup the dex for re-generating oat in the future
       done
       dex="install -d \"$apkdir/oat/$req_android_arch\" && $dex --instruction-set=\"$req_android_arch\" --oat-file=\"$apkdir/oat/$req_android_arch/$apkname.odex\""
-      eval "$dex"
+      eval "logrun $dex"
       # Add the dex2oat command to addon.d for re-running during a restore
       bkup_post_restore="$bkup_post_restore$newline    $dex"
     fi
@@ -1499,7 +1506,7 @@ quit() {
     log "$user_notfound_msg"
     log "# Begin User App Removals NOT Found (from gapps-config)"
     tolog <$user_remove_notfound_log
-    rm -f $user_remove_notfound_log
+    logrun rm -f $user_remove_notfound_log
     log "# End User App Removals NOT Found (from gapps-config)$newline"
   fi
   # Add User App Removals MultipleFound Log if it exists
@@ -1507,7 +1514,7 @@ quit() {
     log "$user_multiplefound_msg"
     log "# Begin User App Removals MULTIPLE Found (from gapps-config)"
     tolog <$user_remove_multiplefound_log
-    rm -f $user_remove_multiplefound_log
+    logrun rm -f $user_remove_multiplefound_log
     log "# End User App Removals MULTIPLE Found (from gapps-config)$newline"
   fi
 
@@ -1516,7 +1523,7 @@ quit() {
     log "$del_conflict_msg"
     log "# Begin GApps <> ROM Duplicate File List"
     tolog <$conflicts_log
-    rm -f $conflicts_log
+    logrun rm -f $conflicts_log
     log "# End GApps <> ROM Duplicate File List$newline"
   fi
 
@@ -1524,7 +1531,7 @@ quit() {
   if [ -r $calc_log ]; then
     log "# Begin GApps Size Calculations"
     tolog <$calc_log
-    rm -f $calc_log
+    logrun rm -f $calc_log
     log "$newline# End GApps Size Calculations"
   fi
 
@@ -1549,13 +1556,13 @@ quit() {
   # Copy logs to proper folder (Same as gapps-config or same as Zip)
   ui_print "- Copying Log to $log_folder"
   ui_print " "
-  cp -f $g_log "$log_folder/open_gapps_log.txt"
+  logrun cp -f $g_log "$log_folder/open_gapps_log.txt"
   set_progress 0.97
 }
 
 set_perm() {
-  chown "$1:$2" "$4"
-  chmod "$3" "$4"
+  logrun chown "$1:$2" "$4"
+  logrun chmod "$3" "$4"
 }
 
 sys_app() {
@@ -1723,19 +1730,19 @@ if [ "$g_conf" ]; then
   else
     config_type="exclude"
   fi
-  sed -i -r -e 's/\<(in|ex)clude\>//gI' "$g_conf" # drop in/exclude from the config
+  logrun sed -i -r -e 's/\<(in|ex)clude\>//gI' "$g_conf" # drop in/exclude from the config
 
   user_remove_list=$(awk -F "[()]" '{ for (i=2; i<NF; i+=2) print $i }' "$g_conf") # Get users list of apk's to remove from gapps-config
-  sed -i -e s/'([^)]*)'/''/g -e '/^$/d' "$g_conf" # Remove all instances of user app removals (stuff between parentheses) and empty lines we might have created
+  logrun sed -i -e s/'([^)]*)'/''/g -e '/^$/d' "$g_conf" # Remove all instances of user app removals (stuff between parentheses) and empty lines we might have created
 else
   config_file="Not Used"
   g_conf="$TMP/proc_gconf"
-  touch "$g_conf"
+  logrun touch "$g_conf"
 fi
 
 # Unless this is a NoDebug install - create folder and take 'Before' snapshots
 if ( ! grep -qiE '^nodebug$' "$g_conf" ); then
-  install -d $TMP/logs
+  logrun install -d $TMP/logs
   ls -alZR /system > $TMP/logs/System_Files_Before.txt
   df -k > $TMP/logs/Device_Space_Before.txt
 fi
@@ -1912,14 +1919,14 @@ fi
 # Check for skipvendorlibs in gapps-config
 if ( grep -qiE '^skipvendorlibs$' $g_conf ); then
   skipvendorlibs="true"
-  mount -t tmpfs tmpfs /system/vendor  # by mounting a tmpfs on this location, we hide the existing files from any operations
+  logrun mount -t tmpfs tmpfs /system/vendor  # by mounting a tmpfs on this location, we hide the existing files from any operations
 else
   skipvendorlibs="false"
 fi
 
 # Remove any files from gapps-remove.txt that should not be processed for automatic removal
 for bypass_file in $removal_bypass_list; do
-  sed -i "\\:${bypass_file}:d" $gapps_removal_list
+  logrun sed -i "\\:${bypass_file}:d" $gapps_removal_list
 done
 
 # Is this a 'Clean' or 'Dirty' install
@@ -2031,7 +2038,7 @@ else
     # Check if permissions were granted to Google Setupwizard, this permissions should always be set in the file if GApps were installed before
     if ! grep -q "com.google.android.setupwizard" /data/system/users/*/runtime-permissions.xml; then
       # Purge the runtime permissions to prevent issues if flashing GApps for the first time on a dirty install
-      rm -f /data/system/users/*/runtime-permissions.xml
+      logrun rm -f /data/system/users/*/runtime-permissions.xml
       clog "Runtime Permissions" "Reset"
     fi
   fi
@@ -2052,7 +2059,7 @@ for pkg in $pkg_names; do
   all_gapps_list=${all_gapps_list}${addto} # Look for method to combine this with line above
   if ( grep -qiE "^${pkg}gapps\$" "$g_conf" ); then # user has selected a 'preset' install
     gapps_type=$pkg
-    sed -i "/ro.addon.open_type/c\\ro.addon.open_type=$pkg" "$TMP/g.prop" # modify g.prop to new package type
+    logrun sed -i "/ro.addon.open_type/c\\ro.addon.open_type=$pkg" "$TMP/g.prop" # modify g.prop to new package type
     break
   fi
 done
@@ -2358,8 +2365,8 @@ for f in $contactsstock_list; do
 done
 if [ "$ignoregooglecontacts" = "true" ]; then
   if ( ! contains "$gapps_list" "contactsgoogle" ) && ( ! grep -qiE '^override$' "$g_conf" ); then
-    sed -i "\\:/system/priv-app/GoogleContacts:d" $gapps_removal_list
-    sed -i "\\:/system/product/priv-app/GoogleContacts:d" $gapps_removal_list
+    logrun sed -i "\\:/system/priv-app/GoogleContacts:d" $gapps_removal_list
+    logrun sed -i "\\:/system/product/priv-app/GoogleContacts:d" $gapps_removal_list
     ignoregooglecontacts="true[NoRemove]"
     install_note="${install_note}nogooglecontacts_removal_msg$newline" # make note that Google Contacts will not be removed
   else
@@ -2376,8 +2383,8 @@ for f in $dialerstock_list; do
 done
 if [ "$ignoregoogledialer" = "true" ]; then
   if ( ! contains "$gapps_list" "dialergoogle" ) && ( ! grep -qiE '^override$' "$g_conf" ); then
-    sed -i "\\:/system/priv-app/GoogleDialer:d" $gapps_removal_list
-    sed -i "\\:/system/product/priv-app/GoogleDialer:d" $gapps_removal_list
+    logrun sed -i "\\:/system/priv-app/GoogleDialer:d" $gapps_removal_list
+    logrun sed -i "\\:/system/product/priv-app/GoogleDialer:d" $gapps_removal_list
     ignoregoogledialer="true[NoRemove]"
     install_note="${install_note}nogoogledialer_removal_msg$newline" # make note that Google Dialer will not be removed
   else
@@ -2411,8 +2418,8 @@ for f in $packageinstallerstock_list; do
 done
 if [ "$ignoregooglepackageinstaller" = "true" ]; then
   if ( ! contains "$gapps_list" "packageinstallergoogle" ) && ( ! grep -qiE '^override$' "$g_conf" ); then
-    sed -i "\\:/system/priv-app/GooglePackageInstaller:d" $gapps_removal_list
-    sed -i "\\:/system/product/priv-app/GooglePackageInstaller:d" $gapps_removal_list
+    logrun sed -i "\\:/system/priv-app/GooglePackageInstaller:d" $gapps_removal_list
+    logrun sed -i "\\:/system/product/priv-app/GooglePackageInstaller:d" $gapps_removal_list
     ignoregooglepackageinstaller="true[NoRemove]"
     install_note="${install_note}nogooglepackageinstaller_removal_msg$newline" # make note that Google Package Installer will not be removed
   else
@@ -2429,8 +2436,8 @@ for f in $tagstock_list; do
 done
 if [ "$ignoregoogletag" = "true" ]; then
   if ( ! contains "$gapps_list" "taggoogle" ) && ( ! grep -qiE '^override$' "$g_conf" ); then
-    sed -i "\\:/system/priv-app/TagGoogle:d" $gapps_removal_list
-    sed -i "\\:/system/product/priv-app/TagGoogle:d" $gapps_removal_list
+    logrun sed -i "\\:/system/priv-app/TagGoogle:d" $gapps_removal_list
+    logrun sed -i "\\:/system/product/priv-app/TagGoogle:d" $gapps_removal_list
     ignoregoogletag="true[NoRemove]"
     install_note="${install_note}nogoogletag_removal_msg$newline" # make note that Google Tag will not be removed
   else
@@ -2681,10 +2688,10 @@ fi
 set_progress 0.13
 ui_print "- Removing existing/obsolete Apps"
 ui_print " "
-rm -rf $(complete_gapps_list)
+logrun rm -rf $(complete_gapps_list)
 
 # Remove Obsolete and Conflicting Apps
-rm -rf $(obsolete_gapps_list)
+logrun rm -rf $(obsolete_gapps_list)
 
 # Remove Stock/AOSP Apps and add Removals to addon.d script
 aosp_remove_list=$(echo "${aosp_remove_list}" | sort -r) # reverse sort list for more readable output
@@ -2692,7 +2699,7 @@ for aosp_name in $aosp_remove_list; do
   eval "list_name=\$${aosp_name}_list"
   list_name=$(echo "${list_name}" | sort -r) # reverse sort list for more readable output
   for file_name in $list_name; do
-    rm -rf "/system/$file_name" "/system/product/$file_name"
+    logrun rm -rf "/system/$file_name" "/system/product/$file_name"
     bkup_pre_restore="$bkup_pre_restore$newline    rm -rf \$SYS/$file_name"
   done
 done
@@ -2703,13 +2710,13 @@ user_remove_folder_list=$(echo "${user_remove_folder_list}$newline${addond_remov
 # Perform User App Removals and add Removals to addon.d script
 user_remove_folder_list=$(echo "${user_remove_folder_list}" | sort -r) # reverse sort list for more readable output
 for user_app in $user_remove_folder_list; do
-  rm -rf "$user_app"
+  logrun rm -rf "$user_app"
   bkup_pre_restore_user_apps="$bkup_pre_restore_user_apps$newline    rm -rf $user_app"
 done
 
 # Remove any empty folders we may have created during the removal process
 for i in /system/app /system/product/app /system/priv-app /system/product/priv-app /system/vendor/pittpatt /system/usr/srec /system/etc/preferred-apps; do
-  find "$i" -type d 2>/dev/null | xargs -r rmdir -p --ignore-fail-on-non-empty
+  find "$i" -type d 2>/dev/null | logrun xargs -r rmdir -p --ignore-fail-on-non-empty
 done
 
 # _____________________________________________________________________________________________________________________
@@ -2762,7 +2769,7 @@ ui_print "- Miscellaneous tasks"
 ui_print " "
 
 # Use Gms (Google Play services) for feedback/bug reporting (instead of org.cyanogenmod.bugreport or others)
-sed -i "s/ro.error.receiver.system.apps=.*/ro.error.receiver.system.apps=com.google.android.gms/g" /system/build.prop
+logrun sed -i "s/ro.error.receiver.system.apps=.*/ro.error.receiver.system.apps=com.google.android.gms/g" /system/build.prop
 bkup_post_restore="$bkup_post_restore$newline    sed -i \"s/ro.error.receiver.system.apps=.*/ro.error.receiver.system.apps=com.google.android.gms/g\" \$SYS/build.prop"
 
 # Enable Google Assistant
@@ -2786,7 +2793,7 @@ fi
 @webviewlibsymlink@
 
 # Copy g.prop over to /system/etc
-cp -f "$TMP/g.prop" "$g_prop"
+logrun cp -f "$TMP/g.prop" "$g_prop"
 
 # _____________________________________________________________________________________________________________________
 #                                                  Build and Install Addon.d Backup Script
@@ -2825,7 +2832,7 @@ substitute_vars \
 # _____________________________________________________________________________________________________________________
 #                                                  Fix Permissions
 set_progress 0.85
-find /system/vendor/pittpatt -type d -exec chown 0:2000 '{}' \; 2>/dev/null # Change pittpatt folders to root:shell per Google Factory Settings
+logrun find /system/vendor/pittpatt -type d -exec chown 0:2000 '{}' \; 2>/dev/null # Change pittpatt folders to root:shell per Google Factory Settings
 
 set_perm 0 0 755 "/system/addon.d/70-gapps.sh"
 ch_con "/system/addon.d/70-gapps.sh"
@@ -2854,7 +2861,7 @@ if ( contains "$gapps_list" "dialergoogle" ); then
       if ! grep -q 'dialer_default_application" value="com.google.android.dialer' "$setsec"; then
         curentry="$(grep -o 'dialer_default_application" value=.*$' "$setsec")"
         newentry='dialer_default_application" value="com.google.android.dialer" package="android" />\r'
-        sed -i "s;${curentry};${newentry};" "$setsec"
+        logrun sed -i "s;${curentry};${newentry};" "$setsec"
       fi
     else
       max="0"
@@ -2862,22 +2869,22 @@ if ( contains "$gapps_list" "dialergoogle" ); then
         test "$i" -gt "$max" && max="$i"
       done
       entry='<setting id="'"$((max + 1))"'" name="dialer_default_application" value="com.google.android.dialer" package="android" />\r'
-      sed -i "/<settings version=\"/a\\ \\ ${entry}" "$setsec"
+      logrun sed -i "/<settings version=\"/a\\ \\ ${entry}" "$setsec"
     fi
   else
     if [ ! -d "/data/system/users/0" ]; then
-      install -d "/data/system/users/0"
-      chown -R 1000:1000 "/data/system"
-      chmod -R 775 "/data/system"
-      chmod 700 "/data/system/users/0"
+      logrun install -d "/data/system/users/0"
+      logrun chown -R 1000:1000 "/data/system"
+      logrun chmod -R 775 "/data/system"
+      logrun chmod 700 "/data/system/users/0"
     fi
     { echo -e "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\\r"
     echo -e '<settings version="'$setver'">\r'
     echo -e '  <setting id="1" name="dialer_default_application" value="com.google.android.dialer" package="android" />\r'
     echo -e '</settings>'; } > "$setsec"
   fi
-  chown 1000:1000 "$setsec"
-  chmod 600 "$setsec"
+  logrun chown 1000:1000 "$setsec"
+  logrun chmod 600 "$setsec"
 fi
 
 exxit 0
