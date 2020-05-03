@@ -352,12 +352,12 @@ webviewcheckhack(){
 # If we're installing webviewgoogle we MUST ADD webviewstub to $aosp_remove_list (if it's not already there)
 if ( contains "$gapps_list" "webviewgoogle" ) && ( ! contains "$aosp_remove_list" "webviewstub" ); then
   aosp_remove_list="${aosp_remove_list}webviewstub$newline"
-fi;
+fi
 
 # If we're installing webviewstub we MUST ADD webviewgoogle to $aosp_remove_list (if it's not already there)
 if ( contains "$gapps_list" "webviewstub" ) && ( ! contains "$aosp_remove_list" "webviewgoogle" ); then
   aosp_remove_list="${aosp_remove_list}webviewgoogle$newline"
-fi;
+fi
 
 # If we're installing webviewgoogle OR webviewstub we PREFER TO ADD webviewstock to $aosp_remove_list (if it's not already there)
 if ( ( contains "$gapps_list" "webviewgoogle" ) || ( contains "$gapps_list" "webviewstub" ) ) && ( ! contains "$aosp_remove_list" "webviewstock" ); then
