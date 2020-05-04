@@ -38,6 +38,15 @@ logrun() {
 }
 log "# Begin Open GApps Install Log"
 log ------------------------------------------------------------------
+trap '
+  if [ $? -ne 0 ]; then
+    nlines=40
+    ui_print "INSTALLATION FAILED. Last $nlines lines of log $g_log:"
+    tail -n "$nlines" "$g_log" | while IFS= read -r line; do
+      ui_print "$line"
+    done
+  fi
+' EXIT
 
 # _____________________________________________________________________________________________________________________
 #                                             Define Current Package Variables
